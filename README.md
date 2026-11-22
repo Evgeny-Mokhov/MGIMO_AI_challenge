@@ -51,18 +51,13 @@
 
 ## Скриншоты интерфейса
 
-<!-- Добавьте 4–5 скриншотов в папку docs/screenshots/ и раскомментируйте таблицу ниже -->
-<!--
 | Главная студента (тёмная тема) | Расписание с переносами и отменами |
 | :---: | :---: |
 | ![Дашборд студента](docs/screenshots/student-dashboard.png) | ![Расписание](docs/screenshots/student-schedule.png) |
 
 | Кабинет администратора | Мобильная версия (375px) |
 | :---: | :---: |
-| ![Админ-панель](docs/screenshots/admin-panel.png) | ![Мобильный вид](docs/screenshots/mobile-view.png) |
--->
-
-_Скриншоты интерфейса хранятся в папке `docs/screenshots/`._
+| ![Админ-панель](docs/screenshots/admin-panel.png) | <img src="docs/screenshots/mobile-view.png" alt="Мобильный вид" width="260" /> |
 
 ---
 
