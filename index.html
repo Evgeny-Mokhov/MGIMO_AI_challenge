@@ -1,0 +1,2857 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ЯМОГУ — Цифровой деканат</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        accent: {
+                            light: '#4F46E5',
+                            dark: '#818CF8',
+                        },
+                        sidebar: {
+                            light: '#FAFAFA',
+                            dark: '#131316',
+                        },
+                        workspace: {
+                            light: '#F2F2F5',
+                            dark: '#0A0A0C',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        .custom-scroll::-webkit-scrollbar { width: 5px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: rgba(113, 113, 122, 0.35);
+            border-radius: 9999px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: rgba(113, 113, 122, 0.55);
+        }
+        input[type="date"]::-webkit-calendar-picker-indicator,
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            opacity: 0.7;
+        }
+        .dark input[type="date"]::-webkit-calendar-picker-indicator,
+        .dark input[type="time"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+        }
+    </style>
+</head>
+<body class="bg-[#F2F2F5] dark:bg-[#0A0A0C] text-zinc-900 dark:text-zinc-100 font-sans antialiased selection:bg-[#4F46E5]/20 dark:selection:bg-[#818CF8]/30 transition-colors duration-200 min-h-screen overflow-x-hidden">
+
+    <!-- СТРАНИЦА АВТОРИЗАЦИИ -->
+    <section id="auth-page" class="min-h-screen w-full flex flex-col items-center justify-center p-4 bg-[#F2F2F5] dark:bg-[#0A0A0C] relative">
+        <button type="button" onclick="toggleTheme()" aria-label="Сменить тему" class="fixed top-4 right-4 sm:top-5 sm:right-5 w-11 h-11 rounded-xl bg-[#FAFAFA] dark:bg-[#131316] border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:border-[#4F46E5] dark:hover:border-[#818CF8] transition-colors">
+            <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+            <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
+        </button>
+
+        <div class="w-full max-w-sm bg-[#FAFAFA] dark:bg-[#131316] border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 sm:p-8 shadow-sm">
+            <div class="mb-7 text-center">
+                <img
+                    src="/static/logo.png"
+                    onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='./static/logo.png';}else{this.classList.add('hidden');}"
+                    alt="Логотип ЯМОГУ"
+                    class="w-14 h-14 object-contain mx-auto mb-3"
+                >
+                <h1 class="text-2xl font-bold tracking-tight">ЯМОГУ</h1>
+                <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-1">Вход в цифровой деканат</p>
+            </div>
+
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label for="login-username" class="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1.5">Логин</label>
+                    <input
+                        id="login-username"
+                        type="text"
+                        required
+                        autocomplete="username"
+                        placeholder="stud_pmpu или admin_jury"
+                        class="w-full px-3.5 py-2.5 text-sm rounded-xl bg-[#F2F2F5] dark:bg-[#0A0A0C] border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] dark:focus:ring-[#818CF8] transition-all"
+                    >
+                </div>
+
+                <div>
+                    <label for="login-password" class="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1.5">Пароль</label>
+                    <input
+                        id="login-password"
+                        type="password"
+                        required
+                        autocomplete="current-password"
+                        placeholder="••••••••"
+                        class="w-full px-3.5 py-2.5 text-sm rounded-xl bg-[#F2F2F5] dark:bg-[#0A0A0C] border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] dark:focus:ring-[#818CF8] transition-all"
+                    >
+                </div>
+
+                <div id="login-error" class="hidden text-xs text-red-600 dark:text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-3 py-2">
+                    Неверный логин или пароль
+                </div>
+
+                <button
+                    id="login-submit"
+                    type="submit"
+                    class="w-full py-2.5 px-4 rounded-xl text-sm font-medium text-white dark:text-[#0A0A0C] bg-[#4F46E5] dark:bg-[#818CF8] hover:opacity-90 active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-60"
+                >
+                    <span>Войти</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- ОСНОВНОЙ ИНТЕРФЕЙС КАБИНЕТА -->
+    <div id="app-shell" class="hidden min-h-screen w-full bg-[#F2F2F5] dark:bg-[#0A0A0C]">
+        <div class="w-full min-h-screen flex items-start p-4 md:p-6 md:gap-6">
+
+            <!-- Затемнение фона для мобильного сайдбара -->
+            <div id="sidebar-backdrop" onclick="closeMobileSidebar()" class="fixed inset-0 z-30 bg-black/50 backdrop-blur-[1px] hidden md:hidden"></div>
+
+            <!-- САЙДБАР (ЕДИНЫЙ ДЛЯ ДЕСКТОПА И МОБИЛЬНЫХ, ДИНАМИЧЕСКИ ПЕРЕКЛЮЧАЕТСЯ ПО РОЛИ) -->
+            <aside id="sidebar" class="fixed md:sticky top-4 md:top-6 left-4 md:left-0 z-40 w-60 md:w-56 shrink-0 transition-transform duration-200 -translate-x-[calc(100%+2rem)] md:translate-x-0">
+                <div class="w-full flex flex-col bg-[#FAFAFA] dark:bg-[#131316] border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 shadow-sm max-h-[calc(100vh-2rem)] md:max-h-[calc(100vh-3rem)] overflow-y-auto custom-scroll">
+
+                    <!-- Кнопка закрытия на мобильных -->
+                    <div class="flex justify-end md:hidden -mb-2">
+                        <button type="button" onclick="closeMobileSidebar()" aria-label="Закрыть меню" class="p-1.5 rounded-lg text-zinc-500 hover:bg-zinc-200/60 dark:hover:bg-zinc-800">
+                            <i data-lucide="x" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+
+                    <!-- Логотип из /static/logo.png и название ниже -->
+                    <div class="flex flex-col items-center pt-2 pb-5 border-b border-zinc-200/80 dark:border-zinc-800/80">
+                        <button type="button" onclick="navigateDefault()" class="flex flex-col items-center group focus:outline-none">
+                            <img
+                                src="/static/logo.png"
+                                onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='./static/logo.png';}else{this.classList.add('hidden');}"
+                                alt="Логотип ЯМОГУ"
+                                class="w-12 h-12 object-contain transition-transform duration-200 group-hover:scale-105"
+                            >
+                            <span class="mt-3 text-xl font-bold tracking-wide text-zinc-900 dark:text-zinc-100 group-hover:text-[#4F46E5] dark:group-hover:text-[#818CF8] transition-colors">
+                                ЯМОГУ
+                            </span>
+                            <span id="sidebar-role-badge" class="hidden mt-1.5 px-2.5 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wider bg-[#4F46E5]/10 dark:bg-[#818CF8]/15 text-[#4F46E5] dark:text-[#818CF8]">
+                                Деканат • Админ
+                            </span>
+                        </button>
+                    </div>
+
+                    <!-- НАВИГАЦИЯ СТУДЕНТА -->
+                    <nav id="nav-student" class="hidden mt-5 space-y-3" aria-label="Меню студента">
+                        <button type="button" data-nav="home" onclick="navigate('home')" class="nav-btn group w-full flex flex-col items-start px-3 py-2 rounded-xl text-base font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/70 transition-colors">
+                            <span class="flex items-center gap-3">
+                                <i data-lucide="home" class="w-5 h-5 shrink-0 text-[#4F46E5] dark:text-[#818CF8]"></i>
+                                <span>Главная</span>
+                            </span>
+                            <span class="nav-underline mt-2 h-[2px] w-10 rounded-full bg-[#4F46E5] dark:bg-[#818CF8] transition-all duration-200 group-hover:w-16"></span>
+                        </button>
+
+                        <button type="button" data-nav="schedule" onclick="navigate('schedule')" class="nav-btn group w-full flex flex-col items-start px-3 py-2 rounded-xl text-base font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/70 transition-colors">
+                            <span class="flex items-center gap-3">
+                                <i data-lucide="calendar-days" class="w-5 h-5 shrink-0 text-[#4F46E5] dark:text-[#818CF8]"></i>
+                                <span>Расписание</span>
+                            </span>
+                            <span class="nav-underline mt-2 h-[2px] w-10 rounded-full bg-[#4F46E5] dark:bg-[#818CF8] transition-all duration-200 group-hover:w-16"></span>
+                        </button>
+
+                        <button type="button" data-nav="profile" onclick="navigate('profile')" class="nav-btn group w-full flex flex-col items-start px-3 py-2 rounded-xl text-base font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/70 transition-colors">
+                            <span class="flex items-center gap-3">
+                                <i data-lucide="user" class="w-5 h-5 shrink-0 text-[#4F46E5] dark:text-[#818CF8]"></i>
+                                <span>Профиль</span>
+                            </span>
+                            <span class="nav-underline mt-2 h-[2px] w-10 rounded-full bg-[#4F46E5] dark:bg-[#818CF8] transition-all duration-200 group-hover:w-16"></span>
+                        </button>
+
+                        <button type="button" data-nav="requests" onclick="navigate('requests')" class="nav-btn group w-full flex flex-col items-start px-3 py-2 rounded-xl text-base font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/70 transition-colors">
+                            <span class="flex items-center gap-3">
+                                <i data-lucide="file-text" class="w-5 h-5 shrink-0 text-[#4F46E5] dark:text-[#818CF8]"></i>
+                                <span>Заявки</span>
+                            </span>
+                            <span class="nav-underline mt-2 h-[2px] w-10 rounded-full bg-[#4F46E5] dark:bg-[#818CF8] transition-all duration-200 group-hover:w-16"></span>
+                        </button>
+
+                        <button type="button" data-nav="grades" onclick="navigate('grades')" class="nav-btn group w-full flex flex-col items-start px-3 py-2 rounded-xl text-base font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/70 transition-colors">
+                            <span class="flex items-center gap-3">
+                                <i data-lucide="award" class="w-5 h-5 shrink-0 text-[#4F46E5] dark:text-[#818CF8]"></i>
+                                <span>Успеваемость</span>
+                            </span>
+                            <span class="nav-underline mt-2 h-[2px] w-10 rounded-full bg-[#4F46E5] dark:bg-[#818CF8] transition-all duration-200 group-hover:w-16"></span>
+                        </button>
+                    </nav>
+
+                    <!-- НАВИГАЦИЯ АДМИНИСТРАТОРА (5 РАЗДЕЛОВ, БЕЗ СТУДЕНЧЕСКИХ СТРАНИЦ) -->
+                    <nav id="nav-admin" class="hidden mt-5 space-y-3" aria-label="Меню администратора">
+                        <button type="button" data-nav="admin-schedule" onclick="navigate('admin-schedule')" class="nav-btn group w-full flex flex-col items-start px-3 py-2 rounded-xl text-base font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/70 transition-colors text-left">
+                            <span class="flex items-center gap-3">
+                                <i data-lucide="calendar-cog" class="w-5 h-5 shrink-0 text-[#4F46E5] dark:text-[#818CF8]"></i>
+                                <span class="leading-tight">Расписание и переносы</span>
+                            </span>
+                            <span class="nav-underline mt-2 h-[2px] w-10 rounded-full bg-[#4F46E5] dark:bg-[#818CF8] transition-all duration-200 group-hover:w-16"></span>
+                        </button>
+
+                        <button type="button" data-nav="admin-requests" onclick="navigate('admin-requests')" class="nav-btn group w-full flex flex-col items-start px-3 py-2 rounded-xl text-base font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/70 transition-colors text-left">
+                            <span class="flex items-center gap-3">
+                                <i data-lucide="clipboard-list" class="w-5 h-5 shrink-0 text-[#4F46E5] dark:text-[#818CF8]"></i>
+                                <span>Заявки</span>
+                            </span>
+                            <span class="nav-underline mt-2 h-[2px] w-10 rounded-full bg-[#4F46E5] dark:bg-[#818CF8] transition-all duration-200 group-hover:w-16"></span>
+                        </button>
+
+                        <button type="button" data-nav="admin-notifications" onclick="navigate('admin-notifications')" class="nav-btn group w-full flex flex-col items-start px-3 py-2 rounded-xl text-base font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/70 transition-colors text-left">
+                            <span class="flex items-center gap-3">
+                                <i data-lucide="megaphone" class="w-5 h-5 shrink-0 text-[#4F46E5] dark:text-[#818CF8]"></i>
+                                <span>Уведомления</span>
+                            </span>
+                            <span class="nav-underline mt-2 h-[2px] w-10 rounded-full bg-[#4F46E5] dark:bg-[#818CF8] transition-all duration-200 group-hover:w-16"></span>
+                        </button>
+
+                        <button type="button" data-nav="admin-students" onclick="navigate('admin-students')" class="nav-btn group w-full flex flex-col items-start px-3 py-2 rounded-xl text-base font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/70 transition-colors text-left">
+                            <span class="flex items-center gap-3">
+                                <i data-lucide="users" class="w-5 h-5 shrink-0 text-[#4F46E5] dark:text-[#818CF8]"></i>
+                                <span>Студенты</span>
+                            </span>
+                            <span class="nav-underline mt-2 h-[2px] w-10 rounded-full bg-[#4F46E5] dark:bg-[#818CF8] transition-all duration-200 group-hover:w-16"></span>
+                        </button>
+                    
+                        <button type="button" data-nav="admin-grades" onclick="navigate('admin-grades')" class="nav-btn group w-full flex flex-col items-start px-3 py-2 rounded-xl text-base font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/70 transition-colors text-left">
+                            <span class="flex items-center gap-3">
+                                <i data-lucide="award" class="w-5 h-5 shrink-0 text-[#4F46E5] dark:text-[#818CF8]"></i>
+                                <span>Оценки</span>
+                            </span>
+                            <span class="nav-underline mt-2 h-[2px] w-10 rounded-full bg-[#4F46E5] dark:bg-[#818CF8] transition-all duration-200 group-hover:w-16"></span>
+                        </button>
+  
+                    </nav>
+ 
+                    <!-- Кнопка Выйти внизу сайдбара -->
+                    <div class="pt-4 mt-5 border-t border-zinc-200/80 dark:border-zinc-800/80">
+                        <button type="button" onclick="logout()" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-base font-medium text-[#4F46E5] dark:text-[#818CF8] hover:bg-[#4F46E5]/10 dark:hover:bg-[#818CF8]/15 transition-colors">
+                            <i data-lucide="log-out" class="w-5 h-5 shrink-0"></i>
+                            <span>Выйти</span>
+                        </button>
+                    </div>
+
+                </div>
+            </aside>
+
+            <!-- ПРАВАЯ РАБОЧАЯ ОБЛАСТЬ -->
+            <div class="flex-1 min-w-0 flex flex-col gap-4 md:gap-6">
+
+                <!-- Верхняя панель -->
+                <header class="w-full flex items-center justify-between gap-2.5 sm:gap-3">
+                    <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                        <button type="button" onclick="openMobileSidebar()" aria-label="Открыть меню" class="md:hidden w-11 h-11 rounded-xl bg-[#FAFAFA] dark:bg-[#131316] border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-300 shrink-0">
+                            <i data-lucide="menu" class="w-5 h-5"></i>
+                        </button>
+
+                        <h2 class="text-base sm:text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 truncate">
+                            Добро пожаловать, <span id="welcome-name">...</span>!
+                        </h2>
+                    </div>
+
+                    <!-- Правый верхний угол -->
+                    <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                        <button
+                            type="button"
+                            onclick="toggleTheme()"
+                            title="Смена темы"
+                            aria-label="Смена темы"
+                            class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-[#FAFAFA] dark:bg-[#131316] border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:border-[#4F46E5] dark:hover:border-[#818CF8] hover:text-[#4F46E5] dark:hover:text-[#818CF8] transition-colors"
+                        >
+                            <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+                            <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
+                        </button>
+
+                        <!-- Кнопки только для студента (скрыты у админа) -->
+                        <button
+                            id="top-btn-notifications"
+                            type="button"
+                            data-top-nav="notifications"
+                            onclick="navigate('notifications')"
+                            title="Уведомления"
+                            aria-label="Уведомления"
+                            class="top-nav-btn hidden relative w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-[#FAFAFA] dark:bg-[#131316] border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:border-[#4F46E5] dark:hover:border-[#818CF8] hover:text-[#4F46E5] dark:hover:text-[#818CF8] transition-colors"
+                        >
+                            <i data-lucide="bell" class="w-5 h-5"></i>
+                            <span id="notif-indicator" class="hidden absolute top-2.5 right-2.5 w-2.5 h-2.5 rounded-full bg-[#4F46E5] dark:bg-[#818CF8]"></span>
+                        </button>
+
+                        <button
+                            id="top-btn-profile"
+                            type="button"
+                            data-top-nav="profile"
+                            onclick="navigate('profile')"
+                            title="Профиль"
+                            aria-label="Профиль"
+                            class="top-nav-btn hidden w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-[#FAFAFA] dark:bg-[#131316] border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:border-[#4F46E5] dark:hover:border-[#818CF8] hover:text-[#4F46E5] dark:hover:text-[#818CF8] transition-colors"
+                        >
+                            <i data-lucide="user" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </header>
+
+                <!-- КОНТЕЙНЕР СТРАНИЦ -->
+                <main class="flex-1 w-full min-w-0">
+
+                    <!-- ========================================================= -->
+                    <!-- =================== СТРАНИЦЫ СТУДЕНТА =================== -->
+                    <!-- ========================================================= -->
+
+                    <!-- ГЛАВНАЯ СТУДЕНТА -->
+                    <section id="page-home" class="page-view hidden">
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6 items-stretch">
+                            <!-- Левая часть: Успеваемость + Расписание на сегодня -->
+                            <div class="lg:col-span-7 flex flex-col gap-4 md:gap-6 min-w-0">
+                                <!-- График успеваемости -->
+                                <div class="bg-[#FAFAFA] dark:bg-[#131316] border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 sm:p-6 shadow-sm flex flex-col min-w-0">
+                                    <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                                        <div>
+                                            <h3 class="text-lg font-semibold tracking-tight">Успеваемость</h3>
+                                            <p id="home-grades-subtitle" class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Данные из электронной зачётки</p>
+                                        </div>
+                                        <div class="flex items-baseline gap-1.5 px-3 py-1.5 rounded-xl bg-[#4F46E5]/10 dark:bg-[#818CF8]/15">
+                                            <span class="text-xs text-zinc-500 dark:text-zinc-400">Средний балл:</span>
+                                            <span id="home-avg-score" class="text-base font-bold text-[#4F46E5] dark:text-[#818CF8]">—</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="w-full rounded-xl bg-[#F2F2F5]/70 dark:bg-[#0A0A0C]/70 border border-zinc-200/70 dark:border-zinc-800/70 p-3 sm:p-4">
+                                        <div class="w-full">
+                                            <svg id="home-grades-svg" class="w-full h-auto max-h-52 block overflow-visible" viewBox="0 0 520 175"></svg>
+                                        </div>
+                                        <div id="home-grade-active-info" class="mt-3 pt-2.5 border-t border-zinc-200/70 dark:border-zinc-800/70 flex items-center justify-between gap-3 text-xs min-h-[24px]"></div>
+                                    </div>
+
+
+                                    <div class="mt-4 flex justify-end">
+                                        <button type="button" onclick="navigate('grades')" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white dark:text-[#0A0A0C] bg-[#4F46E5] dark:bg-[#818CF8] hover:opacity-90 active:scale-[0.99] transition-all">
+                                            <span>Полностью</span>
+                                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Минималистичное расписание на сегодня -->
+                                <div class="bg-[#FAFAFA] dark:bg-[#131316] border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 sm:p-6 shadow-sm flex flex-col min-w-0">
+                                    <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                                        <div>
+                                            <h3 class="text-lg font-semibold tracking-tight">Расписание на сегодня</h3>
+                                            <p id="home-today-label" class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 capitalize">—</p>
+                                        </div>
+                                        <span id="home-today-count" class="text-xs font-medium px-2.5 py-1 rounded-lg bg-[#F2F2F5] dark:bg-[#0A0A0C] border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300">
+                                            —
+                                        </span>
+                                    </div>
+
+                                    <div id="home-pair-buttons" class="grid grid-cols-5 gap-2 sm:gap-3 mb-4"></div>
+
+                                    <div id="home-pair-detail" class="rounded-xl bg-[#F2F2F5]/80 dark:bg-[#0A0A0C]/80 border border-zinc-200/80 dark:border-zinc-800/80 p-4 min-h-[112px] flex flex-col justify-center">
+                                        <p class="text-sm text-zinc-500 dark:text-zinc-400">Загрузка расписания...</p>
+                                    </div>
+
+                                    <div class="mt-4 flex justify-end">
+                                        <button type="button" onclick="navigate('schedule')" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white dark:text-[#0A0A0C] bg-[#4F46E5] dark:bg-[#818CF8] hover:opacity-90 active:scale-[0.99] transition-all">
+                                            <span>Полностью</span>
+                                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Правая часть: Вертикальная лента новостей -->
+                            <div class="lg:col-span-5 relative min-h-[460px] min-w-0">
+                                <div class="lg:absolute lg:inset-0 bg-[#FAFAFA] dark:bg-[#131316] border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 sm:p-6 shadow-sm flex flex-col max-h-[560px] lg:max-h-none">
+                                    <div class="flex items-center justify-between gap-2 pb-4 border-b border-zinc-200/80 dark:border-zinc-800/80 shrink-0">
+                                        <div>
+                                            <h3 class="text-lg font-semibold tracking-tight">Новости вуза</h3>
+                                            <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">События и объявления ЯМОГУ</p>
+                                        </div>
+                                        <span class="w-9 h-9 rounded-xl bg-[#4F46E5]/10 dark:bg-[#818CF8]/15 text-[#4F46E5] dark:text-[#818CF8] flex items-center justify-center shrink-0">
+                                            <i data-lucide="newspaper" class="w-4 h-4"></i>
+                                        </span>
+                                    </div>
+                                    <div id="home-news-feed" class="mt-4 flex-1 overflow-y-auto custom-scroll pr-1.5 space-y-4"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- ПОЛНОЕ РАСПИСАНИЕ СТУДЕНТА -->
+                    <section id="page-schedule" class="page-view hidden space-y-4 md:space-y-6">
+                        <div class="bg-[#FAFAFA] dark:bg-[#131316] border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 sm:p-5 shadow-sm">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div>
+                                    <h3 class="text-xl font-semibold tracking-tight">Расписание занятий</h3>
+                                    <p id="schedule-group-subtitle" class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Учебная группа</p>
+                                </div>
+
+                                <div class="flex flex-wrap items-center gap-2 relative">
+                                    <button type="button" onclick="shiftScheduleWeek(-1)" aria-label="Предыдущая неделя" class="w-10 h-10 rounded-xl bg-[#F2F2F5] dark:bg-[#0A0A0C] border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-200 hover:border-[#4F46E5] dark:hover:border-[#818CF8] transition-colors">
+                                        <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                                    </button>
+
+                                    <button type="button" id="calendar-toggle-btn" onclick="toggleScheduleCalendar()" class="h-10 px-3 rounded-xl bg-[#F2F2F5] dark:bg-[#0A0A0C] border border-zinc-200 dark:border-zinc-800 hover:border-[#4F46E5] dark:hover:border-[#818CF8] flex items-center gap-2 text-xs sm:text-sm font-medium transition-colors">
+                                        <i data-lucide="calendar" class="w-4 h-4 text-[#4F46E5] dark:text-[#818CF8] shrink-0"></i>
+                                        <span id="schedule-week-range" class="whitespace-nowrap">—</span>
+                                    </button>
+
+                                    <button type="button" onclick="shiftScheduleWeek(1)" aria-label="Следующая неделя" class="w-10 h-10 rounded-xl bg-[#F2F2F5] dark:bg-[#0A0A0C] border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-200 hover:border-[#4F46E5] dark:hover:border-[#818CF8] transition-colors">
+                                        <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                                    </button>
+
+                                    <button type="button" onclick="resetScheduleToToday()" class="h-10 px-3 rounded-xl text-xs font-medium text-white dark:text-[#0A0A0C] bg-[#4F46E5] dark:bg-[#818CF8] hover:opacity-90 transition-opacity">
+                                        Сегодня
+                                    </button>
+
+                                    <!-- Календарь (адаптивный под 360px) -->
+                                    <div id="schedule-calendar-popover" class="hidden absolute left-0 sm:left-auto sm:right-0 top-12 z-30 w-72 max-w-[calc(100vw-2.5rem)] bg-[#FAFAFA] dark:bg-[#131316] border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 shadow-xl">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <button type="button" onclick="shiftCalendarMonth(-1)" class="w-8 h-8 rounded-lg hover:bg-zinc-200/70 dark:hover:bg-zinc-800 flex items-center justify-center">
+                                                <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                                            </button>
+                                            <span id="calendar-month-label" class="text-sm font-semibold capitalize">—</span>
+                                            <button type="button" onclick="shiftCalendarMonth(1)" class="w-8 h-8 rounded-lg hover:bg-zinc-200/70 dark:hover:bg-zinc-800 flex items-center justify-center">
+                                                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                                            </button>
+                                        </div>
+                                        <div class="grid grid-cols-7 gap-1 text-center text-[11px] font-medium text-zinc-400 mb-1.5">
+                                            <div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div>Сб</div><div>Вс</div>
+                                        </div>
+                                        <div id="calendar-days-grid" class="grid grid-cols-7 gap-1 text-center text-xs"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="schedule-week-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6"></div>
+                    </section>
+
+                    <!-- УСПЕВАЕМОСТЬ СТУДЕНТА -->
+                    <section id="page-grades" class="page-view hidden space-y-4 md:space-y-6">
+                        <div class="bg-[#FAFAFA] dark:bg-[#131316] border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 sm:p-6 shadow-sm">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div>
+                                    <h3 class="text-xl font-semibold tracking-tight">Успеваемость</h3>
+                                    <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Результаты промежуточной аттестации по семестрам</p>
+                                </div>
+
+                                <div class="inline-flex p-1 rounded-xl bg-[#F2F2F5] dark:bg-[#0A0A0C] border border-zinc-200 dark:border-zinc-800 self-start sm:self-auto">
+                                    <button type="button" data-semester="1" onclick="selectSemester(1)" class="semester-tab px-4 py-2 rounded-lg text-sm font-medium transition-all">1 семестр</button>
+                                    <button type="button" data-semester="2" onclick="selectSemester(2)" class="semester-tab px-4 py-2 rounded-lg text-sm font-medium transition-all">2 семестр</button>
+                                </div>
+                            </div>
+
+                            <div id="grades-semester-stats" class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-5"></div>
+                        </div>
+
+                        <div class="bg-[#FAFAFA] dark:bg-[#131316] border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-sm">
+                            <div id="grades-semester-list" class="divide-y divide-zinc-200/80 dark:divide-zinc-800/80"></div>
+                        </div>
+                    </section>
+
+                    <!-- ПРОФИЛЬ СТУДЕНТА -->
+                    <section id="page-profile" class="page-view hidden space-y-4 md:space-y-6">
+                        <div class="bg-[#FAFAFA] dark:bg-[#131316] border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 sm:p-6 shadow-sm max-w-2xl">
+                            <div class="flex items-center gap-4 pb-5 border-b border-zinc-200/80 dark:border-zinc-800/80">
+                                <div class="w-14 h-14 rounded-2xl bg-[#4F46E5]/10 dark:bg-[#818CF8]/15 text-[#4F46E5] dark:text-[#818CF8] flex items-center justify-center shrink-0">
+                                    <i data-lucide="user-round" class="w-7 h-7"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <h3 id="profile-fullname" class="text-lg sm:text-xl font-semibold break-words">—</h3>
+                                    <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Личная карточка студента</p>
+                                </div>
+                            </div>
+                            <div id="profile-details-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-5"></div>
+                        </div>
+                    </section>
+
+                    <!-- ЗАЯВКИ СТУДЕНТА -->
+                    <section id="page-requests" class="page-view hidden space-y-4 md:space-y-6">
+                        <div class="bg-[#FAFAFA] dark:bg-[#131316] border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 sm:p-6 shadow-sm">
+                            <h3 class="text-xl font-semibold tracking-tight">Заказать справку</h3>
+                            <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Заявка сразу попадёт в обработку в деканат</p>
+
+                            <form id="student-request-form" class="mt-4 flex flex-col sm:flex-row gap-3">
+                                <select id="student-request-type" required class="flex-1 min-w-0 px-3.5 py-2.5 text-sm rounded-xl bg-[#F2F2F5] dark:bg-[#0A0A0C] border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] dark:focus:ring-[#818CF8]">
+                                    <option value="" disabled selected>Выберите тип справки...</option>
+                                    <option value="Справка об обучении">Справка об обучении</option>
+                                    <option value="Справка в военкомат (Приложение №4)">Справка в военкомат (Приложение №4)</option>
+                                    <option value="Справка-вызов на сессию">Справка-вызов на сессию</option>
+                                    <option value="Характеристика с места учёбы">Характеристика с места учёбы</option>
+                                </select>
+                                <button type="submit" class="px-5 py-2.5 rounded-xl text-sm font-medium text-white dark:text-[#0A0A0C] bg-[#4F46E5] dark:bg-[#818CF8] hover:opacity-90 transition-opacity shrink-0">
+                                    Отправить заявку
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="bg-[#FAFAFA] dark:bg-[#131316] border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 sm:p-6 shadow-sm">
+                            <h4 class="text-base font-semibold mb-4">Мои заявки</h4>
+                            <div id="student-requests-list" class="space-y-3"></div>
+                        </div>
+                    </section>
+
+                    <!-- УВЕДОМЛЕНИЯ СТУДЕНТА -->
+                    <section id="page-notifications" class="page-view hidden space-y-4 md:space-y-6">
+                        <div class="bg-[#FAFAFA] dark:bg-[#131316] border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 sm:p-6 shadow-sm">
+                            <div class="flex items-center justify-between gap-2 pb-4 border-b border-zinc-200/80 dark:border-zinc-800/80">
+                                <div>
+                                    <h3 class="text-xl font-semibold tracking-tight">Уведомления</h3>
+                                    <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Изменения расписания, статусы справок и объявления деканата</p>
+                                </div>
+                            </div>
+                            <div id="student-notifications-list" class="mt-4 space-y-3"></div>
+                        </div>
+                    </section>
+
+                    <!-- ========================================================= -->
+                    <!-- =================== СТРАНИЦЫ АДМИНА ===================== -->
+                    <!-- ========================================================= -->
+
+                    <!-- 1. АДМИН: РАСПИСАНИЕ И ПЕРЕНОСЫ -->
+                    <section id="page-admin-schedule" class="page-view hidden space-y-4 md:space-y-6">
+                        <div class="bg-[#FAFAFA] dark:bg-[#131316] border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 sm:p-6 shadow-sm">
+                            <div class="flex flex-col gap-4">
+                                <div>
+                                    <h3 class="text-xl font-semibold tracking-tight">Расписание и переносы</h3>
+                                    <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Точечные отмены и переносы на выбранную дату с авто-уведомлением группы</p>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+                                    <div class="sm:col-span-5">
+                                        <label for="admin-schedule-group" class="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">Учебная группа</label>
+                                        <select id="admin-schedule-group" onchange="loadAdminScheduleForDate()" class="w-full h-11 px-3.5 text-sm rounded-xl bg-[#F2F2F5] dark:bg-[#0A0A0C] border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] dark:focus:ring-[#818CF8]">
+                                            <option value="">Загрузка групп...</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="sm:col-span-5">
+                                        <label for="admin-schedule-date" class="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">Дата занятия</label>
+                                        <div class="flex items-center gap-1.5">
+                                            <button type="button" onclick="shiftAdminScheduleDate(-1)" aria-label="Предыдущий день" class="w-10 h-11 shrink-0 rounded-xl bg-[#F2F2F5] dark:bg-[#0A0A0C] border border-zinc-200 dark:border-zinc-800 flex items-center justify-center hover:border-[#4F46E5] dark:hover:border-[#818CF8] transition-colors">
+                                                <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                                            </button>
+                                            <input id="admin-schedule-date" type="date" onchange="loadAdminScheduleForDate()" class="flex-1 min-w-0 h-11 px-3 text-sm rounded-xl bg-[#F2F2F5] dark:bg-[#0A0A0C] border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] dark:focus:ring-[#818CF8]">
+                                            <button type="button" onclick="shiftAdminScheduleDate(1)" aria-label="Следующий день" class="w-10 h-11 shrink-0 rounded-xl bg-[#F2F2F5] dark:bg-[#0A0A0C] border border-zinc-200 dark:border-zinc-800 flex items-center justify-center hover:border-[#4F46E5] dark:hover:border-[#818CF8] transition-colors">
+                                                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="sm:col-span-2">
+                                        <button type="button" onclick="setAdminScheduleToday()" class="w-full h-11 px-3 rounded-xl text-xs font-medium text-white dark:text-[#0A0A0C] bg-[#4F46E5] dark:bg-[#818CF8] hover:opacity-90 transition-opacity">
+                                            Сегодня
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-[#FAFAFA] dark:bg-[#131316] border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 sm:p-6 shadow-sm">
+                            <div class="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-zinc-200/80 dark:border-zinc-800/80">
+                                <div>
+                                    <h4 id="admin-schedule-day-title" class="text-base font-semibold">Пары на выбранную дату</h4>
+                                    <p id="admin-schedule-day-meta" class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">—</p>
+                                </div>
+                            </div>
+                            <div id="admin-schedule-list" class="mt-4 space-y-3"></div>
+                        </div>
+                    </section>
+
+                    <!-- 2. АДМИН: ЗАЯВКИ -->
+                    <section id="page-admin-requests" class="page-view hidden space-y-4 md:space-y-6">
+                        <div class="bg-[#FAFAFA] dark:bg-[#131316] border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 sm:p-6 shadow-sm">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div>
+                                    <h3 class="text-xl font-semibold tracking-tight">Заявки на справки</h3>
+                                    <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Смена статуса автоматически отправляет уведомление студенту</p>
+                                </div>
+
+                                <div class="inline-flex flex-wrap p-1 rounded-xl bg-[#F2F2F5] dark:bg-[#0A0A0C] border border-zinc-200 dark:border-zinc-800 self-start sm:self-auto gap-1">
+                                    <button type="button" data-req-filter="all" onclick="setAdminRequestFilter('all')" class="admin-req-filter px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all">Все</button>
+                                    <button type="button" data-req-filter="pending" onclick="setAdminRequestFilter('pending')" class="admin-req-filter px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all">В обработке</button>
+                                    <button type="button" data-req-filter="completed" onclick="setAdminRequestFilter('completed')" class="admin-req-filter px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all">Завершённые</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="admin-requests-list" class="space-y-3"></div>
+                    </section>
+
+                    <!-- 3. АДМИН: УВЕДОМЛЕНИЯ -->
+                    <section id="page-admin-notifications" class="page-view hidden space-y-4 md:space-y-6">
+                        <div class="bg-[#FAFAFA] dark:bg-[#131316] border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 sm:p-6 shadow-sm max-w-2xl">
+                            <h3 class="text-xl font-semibold tracking-tight">Рассылка уведомлений</h3>
+                            <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Отправка объявлений всем студентам, отдельной группе или конкретному студенту</p>
+
+                            <form id="admin-notif-form" class="mt-5 space-y-4">
+                                <div>
+                                    <label for="admin-notif-target-type" class="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1.5">Кому отправить</label>
+                                    <select id="admin-notif-target-type" onchange="handleAdminNotifTargetChange()" class="w-full h-11 px-3.5 text-sm rounded-xl bg-[#F2F2F5] dark:bg-[#0A0A0C] border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] dark:focus:ring-[#818CF8]">
+                                        <option value="all">Всем студентам</option>
+                                        <option value="group">Конкретной группе</option>
+                                        <option value="student">Одному студенту</option>
+                                    </select>
+                                </div>
+
+                                <div id="admin-notif-group-wrap" class="hidden">
+                                    <label for="admin-notif-group" class="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1.5">Выберите группу</label>
+                                    <select id="admin-notif-group" class="w-full h-11 px-3.5 text-sm rounded-xl bg-[#F2F2F5] dark:bg-[#0A0A0C] border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] dark:focus:ring-[#818CF8]"></select>
+                                </div>
+
+                                <div id="admin-notif-student-wrap" class="hidden">
+                                    <label for="admin-notif-student" class="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1.5">Выберите студента</label>
+                                    <select id="admin-notif-student" class="w-full h-11 px-3.5 text-sm rounded-xl bg-[#F2F2F5] dark:bg-[#0A0A0C] border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] dark:focus:ring-[#818CF8]"></select>
+                                </div>
+
+                                <div>
+                                    <label for="admin-notif-message" class="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1.5">Текст объявления</label>
+                                    <textarea
+                                        id="admin-notif-message"
+                                        rows="4"
+                                        required
+                                        maxlength="1000"
+                                        placeholder="Например: Напоминаем о сдаче задолженностей до пятницы..."
+                                        class="w-full px-3.5 py-2.5 text-sm rounded-xl bg-[#F2F2F5] dark:bg-[#0A0A0C] border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] dark:focus:ring-[#818CF8] resize-y"
+                                    ></textarea>
+                                </div>
+
+                                <div class="flex justify-end">
+                                    <button id="admin-notif-submit" type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium text-white dark:text-[#0A0A0C] bg-[#4F46E5] dark:bg-[#818CF8] hover:opacity-90 active:scale-[0.99] transition-all disabled:opacity-60">
+                                        <i data-lucide="send" class="w-4 h-4"></i>
+                                        <span>Отправить</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </section>
+
+                    <!-- 4. АДМИН: СТУДЕНТЫ -->
+                    <section id="page-admin-students" class="page-view hidden space-y-4 md:space-y-6">
+                        <!-- Форма регистрации нового студента -->
+                        <div class="bg-[#FAFAFA] dark:bg-[#131316] border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 sm:p-6 shadow-sm">
+                            <h3 class="text-xl font-semibold tracking-tight">Добавить студента</h3>
+                            <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Пароль хэшируется на сервере через bcrypt</p>
+
+                            <form id="admin-student-form" class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                                <div>
+                                    <label for="new-stud-fullname" class="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1">ФИО</label>
+                                    <input id="new-stud-fullname" type="text" required placeholder="Петров Пётр Петрович" class="w-full h-10 px-3 text-sm rounded-xl bg-[#F2F2F5] dark:bg-[#0A0A0C] border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] dark:focus:ring-[#818CF8]">
+                                </div>
+
+                                <div>
+                                    <label for="new-stud-username" class="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1">Логин</label>
+                                    <input id="new-stud-username" type="text" required minlength="3" placeholder="stud_petrov" class="w-full h-10 px-3 text-sm rounded-xl bg-[#F2F2F5] dark:bg-[#0A0A0C] border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] dark:focus:ring-[#818CF8]">
+                                </div>
+
+                                <div>
+                                    <label for="new-stud-password" class="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1">Пароль</label>
+                                    <input id="new-stud-password" type="password" required minlength="4" placeholder="Минимум 4 символа" class="w-full h-10 px-3 text-sm rounded-xl bg-[#F2F2F5] dark:bg-[#0A0A0C] border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] dark:focus:ring-[#818CF8]">
+                                </div>
+
+                                <div>
+                                    <label for="new-stud-faculty" class="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1">Факультет</label>
+                                    <input id="new-stud-faculty" type="text" required placeholder="ПМ-ПУ" class="w-full h-10 px-3 text-sm rounded-xl bg-[#F2F2F5] dark:bg-[#0A0A0C] border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] dark:focus:ring-[#818CF8]">
+                                </div>
+
+                                <div>
+                                    <label for="new-stud-group" class="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1">Группа</label>
+                                    <input id="new-stud-group" type="text" list="admin-groups-datalist" required placeholder="Группа 101" class="w-full h-10 px-3 text-sm rounded-xl bg-[#F2F2F5] dark:bg-[#0A0A0C] border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] dark:focus:ring-[#818CF8]">
+                                    <datalist id="admin-groups-datalist"></datalist>
+                                </div>
+
+                                <div>
+                                    <label for="new-stud-book" class="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1">Номер зачётки</label>
+                                    <input id="new-stud-book" type="text" required placeholder="PMPU-26-009" class="w-full h-10 px-3 text-sm rounded-xl bg-[#F2F2F5] dark:bg-[#0A0A0C] border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] dark:focus:ring-[#818CF8]">
+                                </div>
+
+                                <div id="admin-student-form-error" class="hidden sm:col-span-2 lg:col-span-3 text-xs text-red-600 dark:text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-3.5 py-2.5"></div>
+
+                                <div class="sm:col-span-2 lg:col-span-3 flex justify-end pt-1">
+                                    <button id="admin-student-submit" type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium text-white dark:text-[#0A0A0C] bg-[#4F46E5] dark:bg-[#818CF8] hover:opacity-90 active:scale-[0.99] transition-all disabled:opacity-60">
+                                        <i data-lucide="user-plus" class="w-4 h-4"></i>
+                                        <span>Зарегистрировать студента</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Список зарегистрированных студентов (таблица на десктопе, карточки на мобильных 360px+) -->
+                        <div class="bg-[#FAFAFA] dark:bg-[#131316] border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 sm:p-6 shadow-sm">
+                            <div class="flex items-center justify-between gap-2 pb-4 border-b border-zinc-200/80 dark:border-zinc-800/80">
+                                <h4 class="text-base font-semibold">Зарегистрированные студенты</h4>
+                                <span id="admin-students-count" class="text-xs font-medium px-2.5 py-1 rounded-lg bg-[#F2F2F5] dark:bg-[#0A0A0C] border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300">0</span>
+                            </div>
+
+                            <!-- Десктоп-таблица -->
+                            <div class="hidden md:block mt-3 overflow-x-auto">
+                                <table class="w-full text-left text-sm">
+                                    <thead>
+                                        <tr class="border-b border-zinc-200/80 dark:border-zinc-800/80 text-xs text-zinc-500 dark:text-zinc-400">
+                                            <th class="py-3 pr-4 font-medium">ФИО</th>
+                                            <th class="py-3 px-3 font-medium">Логин</th>
+                                            <th class="py-3 px-3 font-medium">Факультет</th>
+                                            <th class="py-3 px-3 font-medium">Группа</th>
+                                            <th class="py-3 pl-3 font-medium text-right">Зачётка</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="admin-students-tbody" class="divide-y divide-zinc-200/70 dark:divide-zinc-800/70"></tbody>
+                                </table>
+                            </div>
+
+                            <!-- Мобильные карточки (< 768px) -->
+                            <div id="admin-students-cards" class="md:hidden mt-4 space-y-3"></div>
+                        </div>
+                    </section>
+
+                                        <!-- 5. АДМИН: ОЦЕНКИ -->
+                    <section id="page-admin-grades" class="page-view hidden space-y-4 md:space-y-6">
+                        <div class="bg-[#FAFAFA] dark:bg-[#131316] border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 sm:p-6 shadow-sm">
+                            <h3 class="text-xl font-semibold tracking-tight">Выставление оценок</h3>
+                            <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Экзаменационные оценки (5/4/3/2) автоматически отображаются на графике успеваемости студента</p>
+
+                            <form id="admin-grade-form" class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                                <div class="sm:col-span-2 lg:col-span-1">
+                                    <label for="admin-grade-student" class="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1">Студент</label>
+                                    <select id="admin-grade-student" required onchange="loadAdminStudentGrades()" class="w-full h-10 px-3 text-sm rounded-xl bg-[#F2F2F5] dark:bg-[#0A0A0C] border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] dark:focus:ring-[#818CF8]"></select>
+                                </div>
+
+                                <div>
+                                    <label for="admin-grade-semester" class="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1">Семестр</label>
+                                    <select id="admin-grade-semester" required class="w-full h-10 px-3 text-sm rounded-xl bg-[#F2F2F5] dark:bg-[#0A0A0C] border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] dark:focus:ring-[#818CF8]">
+                                        <option value="1">1 семестр</option>
+                                        <option value="2" selected>2 семестр</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label for="admin-grade-subject" class="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1">Предмет</label>
+                                    <input id="admin-grade-subject" type="text" list="admin-subjects-datalist" required placeholder="Математический анализ" class="w-full h-10 px-3 text-sm rounded-xl bg-[#F2F2F5] dark:bg-[#0A0A0C] border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] dark:focus:ring-[#818CF8]">
+                                    <datalist id="admin-subjects-datalist">
+                                        <option value="Алгебра"></option>
+                                        <option value="Математический анализ"></option>
+                                        <option value="Аналитическая геометрия"></option>
+                                        <option value="Основы программирования"></option>
+                                        <option value="История"></option>
+                                        <option value="Основы Российской государственности"></option>
+                                        <option value="Английский язык"></option>
+                                    </datalist>
+                                </div>
+
+                                <div>
+                                    <label for="admin-grade-type" class="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1">Тип контроля</label>
+                                    <select id="admin-grade-type" onchange="syncAdminGradeOptions()" class="w-full h-10 px-3 text-sm rounded-xl bg-[#F2F2F5] dark:bg-[#0A0A0C] border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] dark:focus:ring-[#818CF8]">
+                                        <option value="экзамен" selected>Экзамен (идёт на график)</option>
+                                        <option value="зачет">Зачёт</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label for="admin-grade-value" class="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1">Оценка</label>
+                                    <select id="admin-grade-value" required class="w-full h-10 px-3 text-sm rounded-xl bg-[#F2F2F5] dark:bg-[#0A0A0C] border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] dark:focus:ring-[#818CF8]"></select>
+                                </div>
+
+                                <div class="flex items-end">
+                                    <button id="admin-grade-submit" type="submit" class="w-full h-10 px-4 rounded-xl text-sm font-medium text-white dark:text-[#0A0A0C] bg-[#4F46E5] dark:bg-[#818CF8] hover:opacity-90 active:scale-[0.99] transition-all inline-flex items-center justify-center gap-2 disabled:opacity-60">
+                                        <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                                        <span>Поставить оценку</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="bg-[#FAFAFA] dark:bg-[#131316] border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 sm:p-6 shadow-sm">
+                            <div class="flex items-center justify-between gap-2 pb-4 border-b border-zinc-200/80 dark:border-zinc-800/80">
+                                <h4 class="text-base font-semibold">Выставленные оценки студента</h4>
+                                <span id="admin-grades-count" class="text-xs font-medium px-2.5 py-1 rounded-lg bg-[#F2F2F5] dark:bg-[#0A0A0C] border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300">0</span>
+                            </div>
+                            <div id="admin-grades-list" class="mt-4 space-y-2.5"></div>
+                        </div>
+                    </section>
+
+
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <!-- КОНТЕЙНЕР ДЛЯ ВСПЛЫВАЮЩИХ УВЕДОМЛЕНИЙ (ТОСТОВ) -->
+    <div id="toast-container" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 z-50 flex flex-col gap-2 sm:w-96 pointer-events-none"></div>
+
+    <script>
+        const API_URL = window.location.protocol === 'file:'
+            ? 'http://localhost:8000/api'
+            : `${window.location.origin}/api`;
+
+        const PAIR_TIMES = {
+            1: { start: '09:30', end: '11:00' },
+            2: { start: '11:10', end: '12:40' },
+            3: { start: '13:40', end: '15:10' },
+            4: { start: '15:20', end: '16:50' },
+            5: { start: '17:00', end: '18:30' }
+        };
+
+        const DAY_NAMES_FULL = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
+        const MONTHS_GENITIVE = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+        const MONTHS_NOMINATIVE = ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'];
+
+        const NEWS_ITEMS = [
+            {
+                id: 1,
+                tag: 'Хакатон',
+                date: '20 ноября',
+                title: 'Хакатон «Цифровой деканат будущего»',
+                text: 'Команды студентов ПМ-ПУ и ПМИ представляют прототипы современных сервисов для автоматизации учебного процесса. Финальная защита проектов пройдёт в главном корпусе.',
+                image: '/static/news/hac.avif',
+                fallbackImage: './static/news/hac.avif'
+            },
+            {
+                id: 2,
+                tag: 'Учебный процесс',
+                date: '19 ноября',
+                title: 'Открыта запись на зимние факультативы по ИИ',
+                text: 'До 30 ноября студенты 1–3 курсов могут выбрать дополнительные спецкурсы по машинному обучению, алгоритмам и прикладной разработке.'
+            },
+            {
+                id: 3,
+                tag: 'Праздник',
+                date: '17 ноября',
+                title: 'День рождения университета ЯМОГУ',
+                text: 'Приглашаем студентов и преподавателей на праздничный концерт, квиз от студенческого совета и интерактивные площадки во внутреннем дворике.',
+                image: '/static/news/birth.jpg',
+                fallbackImage: './static/news/birth.jpg'
+            },
+            {
+                id: 4,
+                tag: 'Объявление',
+                date: '15 ноября',
+                title: 'Обновлён график работы читального зала',
+                text: 'В период подготовки к зачётной неделе главный читальный зал и коворкинг на 3-м этаже открыты ежедневно с 08:30 до 22:00.'
+            },
+            {
+                id: 5,
+                tag: 'Ивент',
+                date: '12 ноября',
+                title: 'Набор участников в студенческий научный клуб',
+                text: 'Еженедельные разборы научных статей, подготовка к олимпиадам по программированию и совместные пет-проекты. Встречи проходят по четвергам после 4-й пары.'
+            }
+        ];
+
+        const STUDENT_PAGES = ['home', 'schedule', 'profile', 'requests', 'grades', 'notifications'];
+        const ADMIN_PAGES = ['admin-schedule', 'admin-requests', 'admin-notifications', 'admin-students', 'admin-grades'];
+
+
+        const appState = {
+            token: localStorage.getItem('dekanat_token'),
+            userId: null,
+            role: null,
+            me: null,
+            currentPage: null,
+            // Студент
+            profile: null,
+            todaySchedule: { items: [], holiday: null },
+            weekSchedule: { items: [], holidays: {} },
+            grades: [],
+            requests: [],
+            notifications: [],
+            selectedTodayPair: 1,
+            selectedSemester: null,
+            scheduleAnchorDate: new Date(),
+            calendarViewDate: new Date(),
+            calendarOpen: false,
+            // Админ
+            adminGroups: [],
+            adminGrades: [],
+            adminStudents: [],
+            adminRequests: [],
+            adminRequestFilter: 'all',
+            adminScheduleData: null,
+            adminActiveEditor: null // { scheduleId, mode: 'rescheduled' | 'cancelled' }
+        };
+
+        // === УТИЛИТЫ ===
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function toIsoDate(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        function parseIsoDate(isoStr) {
+            const [y, m, d] = isoStr.split('-').map(Number);
+            return new Date(y, m - 1, d);
+        }
+
+        function getMonday(date) {
+            const d = new Date(date);
+            d.setHours(0, 0, 0, 0);
+            const day = d.getDay();
+            const diff = day === 0 ? -6 : 1 - day;
+            d.setDate(d.getDate() + diff);
+            return d;
+        }
+
+        function isSameDay(a, b) {
+            return a.getFullYear() === b.getFullYear() &&
+                a.getMonth() === b.getMonth() &&
+                a.getDate() === b.getDate();
+        }
+
+        function formatWeekRange(mondayDate) {
+            const sunday = new Date(mondayDate);
+            sunday.setDate(mondayDate.getDate() + 6);
+            if (mondayDate.getMonth() === sunday.getMonth()) {
+                return `${mondayDate.getDate()}–${sunday.getDate()} ${MONTHS_GENITIVE[mondayDate.getMonth()]} ${sunday.getFullYear()}`;
+            }
+            return `${mondayDate.getDate()} ${MONTHS_GENITIVE[mondayDate.getMonth()].slice(0, 3)} – ${sunday.getDate()} ${MONTHS_GENITIVE[sunday.getMonth()].slice(0, 3)} ${sunday.getFullYear()}`;
+        }
+
+        function formatDateTime(ts) {
+            if (!ts) return '—';
+            const cleaned = String(ts).replace('T', ' ').slice(0, 16);
+            const [datePart, timePart] = cleaned.split(' ');
+            if (!datePart) return cleaned;
+            const parts = datePart.split('-');
+            if (parts.length !== 3) return cleaned;
+            return `${parts[2]}.${parts[1]}.${parts[0]}${timePart ? `, ${timePart}` : ''}`;
+        }
+
+        function getStatusMeta(rawStatus) {
+            const s = String(rawStatus || '').toLowerCase();
+            if (s === 'готова' || s === 'готово') {
+                return { label: 'Готово', cls: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400' };
+            }
+            if (s === 'отклонена' || s === 'отклонено') {
+                return { label: 'Отклонено', cls: 'bg-red-500/15 text-red-600 dark:text-red-400' };
+            }
+            return { label: 'В обработке', cls: 'bg-amber-500/15 text-amber-700 dark:text-amber-400' };
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const isError = type === 'error';
+            const icon = isError ? 'alert-circle' : 'check-circle-2';
+            const colorCls = isError
+                ? 'border-red-500/35 bg-[#FAFAFA] dark:bg-[#131316] text-red-600 dark:text-red-400'
+                : 'border-[#4F46E5]/35 dark:border-[#818CF8]/35 bg-[#FAFAFA] dark:bg-[#131316] text-zinc-900 dark:text-zinc-100';
+
+            toast.className = `pointer-events-auto rounded-2xl border px-4 py-3 shadow-lg flex items-start gap-2.5 text-sm transition-all duration-200 translate-y-2 opacity-0 ${colorCls}`;
+            toast.innerHTML = `
+                <i data-lucide="${icon}" class="w-4 h-4 mt-0.5 shrink-0 ${isError ? 'text-red-500' : 'text-[#4F46E5] dark:text-[#818CF8]'}"></i>
+                <span class="leading-snug break-words flex-1">${escapeHtml(message)}</span>
+            `;
+
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            });
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => toast.remove(), 220);
+            }, 3500);
+        }
+
+        // === ТЕМА (С СОХРАНЕНИЕМ ПО АККАУНТУ) ===
+        function getUserIdFromToken(token) {
+            if (!token) return null;
+            try {
+                const payloadPart = token.split('.')[1];
+                const normalized = payloadPart.replace(/-/g, '+').replace(/_/g, '/');
+                const payload = JSON.parse(atob(normalized));
+                return payload.sub ? String(payload.sub) : null;
+            } catch {
+                return null;
+            }
+        }
+
+        function applyTheme(theme) {
+            document.documentElement.classList.toggle('dark', theme !== 'light');
+        }
+
+        function loadThemeForAccount(userId) {
+            if (!userId) return;
+            const key = `dekanat_theme_user_${userId}`;
+            const saved = localStorage.getItem(key);
+            if (saved === 'light' || saved === 'dark') {
+                applyTheme(saved);
+            } else {
+                const current = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+                localStorage.setItem(key, current);
+            }
+        }
+
+        function initTheme() {
+            const existingUserId = getUserIdFromToken(appState.token);
+            if (existingUserId) {
+                appState.userId = existingUserId;
+                loadThemeForAccount(existingUserId);
+            } else {
+                applyTheme(localStorage.getItem('dekanat_theme_guest') || 'dark');
+            }
+        }
+
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            const newTheme = isDark ? 'dark' : 'light';
+            if (appState.userId) {
+                localStorage.setItem(`dekanat_theme_user_${appState.userId}`, newTheme);
+            } else {
+                localStorage.setItem('dekanat_theme_guest', newTheme);
+            }
+            if (appState.currentPage === 'home' && appState.role === 'student') {
+                renderHomeGradesChart();
+            }
+        }
+
+        // === МОБИЛЬНЫЙ САЙДБАР ===
+        function openMobileSidebar() {
+            document.getElementById('sidebar').classList.remove('-translate-x-[calc(100%+2rem)]');
+            document.getElementById('sidebar-backdrop').classList.remove('hidden');
+        }
+
+        function closeMobileSidebar() {
+            document.getElementById('sidebar').classList.add('-translate-x-[calc(100%+2rem)]');
+            document.getElementById('sidebar-backdrop').classList.add('hidden');
+        }
+
+        // === API ЗАПРОСЫ ===
+        async function apiFetch(endpoint, options = {}) {
+            const headers = {
+                'Authorization': `Bearer ${appState.token}`,
+                ...(options.headers || {})
+            };
+
+            const response = await fetch(`${API_URL}${endpoint}`, {
+                ...options,
+                headers
+            });
+
+            if (response.status === 401) {
+                logout();
+                throw new Error('Unauthorized');
+            }
+
+            let data = null;
+            try {
+                data = await response.json();
+            } catch {
+                data = null;
+            }
+
+            if (!response.ok) {
+                let errMsg = `Ошибка сервера (${response.status})`;
+                if (data && data.detail) {
+                    errMsg = Array.isArray(data.detail)
+                        ? data.detail.map(e => e.msg || JSON.stringify(e)).join(', ')
+                        : String(data.detail);
+                }
+                const err = new Error(errMsg);
+                err.status = response.status;
+                throw err;
+            }
+
+            return data;
+        }
+
+        // === РОЛЕВОЙ SHELL ===
+        function configureRoleUI(role, fullName) {
+            const isAdmin = role === 'admin';
+            document.getElementById('nav-student').classList.toggle('hidden', isAdmin);
+            document.getElementById('nav-admin').classList.toggle('hidden', !isAdmin);
+            document.getElementById('sidebar-role-badge').classList.toggle('hidden', !isAdmin);
+
+            // Убираем студенческие кнопки из шапки для админа
+            document.getElementById('top-btn-notifications').classList.toggle('hidden', isAdmin);
+            document.getElementById('top-btn-profile').classList.toggle('hidden', isAdmin);
+
+            const parts = String(fullName || '').trim().split(/\s+/);
+            const displayName = isAdmin
+                ? (parts.length >= 2 ? parts[1] : (parts[0] || 'Администратор'))
+                : (parts.length >= 2 ? parts[1] : (parts[0] || 'Студент'));
+            document.getElementById('welcome-name').textContent = displayName;
+        }
+
+        function navigateDefault() {
+            navigate(appState.role === 'admin' ? 'admin-schedule' : 'home');
+        }
+
+        // === НАВИГАЦИЯ С УЧЁТОМ РОЛИ ===
+        async function navigate(page) {
+            const isAdmin = appState.role === 'admin';
+            const allowed = isAdmin ? ADMIN_PAGES : STUDENT_PAGES;
+            if (!allowed.includes(page)) {
+                page = isAdmin ? 'admin-schedule' : 'home';
+            }
+
+            appState.currentPage = page;
+            if (window.location.hash !== `#${page}`) {
+                history.replaceState(null, '', `#${page}`);
+            }
+
+            document.querySelectorAll('.page-view').forEach(section => section.classList.add('hidden'));
+            const targetEl = document.getElementById(`page-${page}`);
+            if (targetEl) targetEl.classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                const isActive = btn.dataset.nav === page;
+                const underline = btn.querySelector('.nav-underline');
+                btn.classList.toggle('bg-[#4F46E5]/10', isActive);
+                btn.classList.toggle('dark:bg-[#818CF8]/15', isActive);
+                btn.classList.toggle('text-[#4F46E5]', isActive);
+                btn.classList.toggle('dark:text-[#818CF8]', isActive);
+                btn.classList.toggle('text-zinc-700', !isActive);
+                btn.classList.toggle('dark:text-zinc-200', !isActive);
+                if (underline) {
+                    underline.classList.toggle('w-16', isActive);
+                    underline.classList.toggle('w-10', !isActive);
+                }
+            });
+
+            document.querySelectorAll('.top-nav-btn').forEach(btn => {
+                const isActive = btn.dataset.topNav === page;
+                btn.classList.toggle('border-[#4F46E5]', isActive);
+                btn.classList.toggle('dark:border-[#818CF8]', isActive);
+                btn.classList.toggle('text-[#4F46E5]', isActive);
+                btn.classList.toggle('dark:text-[#818CF8]', isActive);
+            });
+
+            closeMobileSidebar();
+
+            // Подгрузка данных по выбранной странице
+            if (!isAdmin) {
+                if (page === 'home') {
+                    await Promise.all([loadTodaySchedule(), loadGradesData()]);
+                    renderHomeNews();
+                    renderHomeGradesChart();
+                    renderHomeSchedule(true);
+                } else if (page === 'schedule') {
+                    await loadWeekSchedule();
+                    renderFullSchedulePage();
+                } else if (page === 'grades') {
+                    await loadGradesData();
+                    renderGradesPage();
+                } else if (page === 'profile') {
+                    await loadProfileData();
+                    renderStudentProfilePage();
+                } else if (page === 'requests') {
+                    await loadRequestsData();
+                    renderStudentRequestsPage();
+                } else if (page === 'notifications') {
+                    await loadNotificationsData();
+                    renderStudentNotificationsPage();
+                }
+            } else {
+                if (page === 'admin-schedule') {
+                    await initAdminSchedulePage();
+                } else if (page === 'admin-requests') {
+                    await loadAdminRequests();
+                } else if (page === 'admin-notifications') {
+                    await initAdminNotificationsPage();
+                } else if (page === 'admin-students') {
+                    await Promise.all([loadAdminGroups(), loadAdminStudents()]);
+                    renderAdminStudentsPage();
+                } else if (page === 'admin-grades') {
+                    await initAdminGradesPage();
+                }
+            }
+
+            lucide.createIcons();
+        }
+
+        // =============================================================
+        // ================== ЛОГИКА СТУДЕНТА ==========================
+        // =============================================================
+
+        async function loadProfileData() {
+            try {
+                const profile = await apiFetch('/profile');
+                appState.profile = profile;
+                const parts = (profile.full_name || '').trim().split(/\s+/);
+                const firstName = parts.length >= 2 ? parts[1] : (parts[0] || 'Студент');
+                document.getElementById('welcome-name').textContent = firstName;
+                const subtitle = document.getElementById('schedule-group-subtitle');
+                if (subtitle) subtitle.textContent = `${profile.faculty} • ${profile.group_name}`;
+            } catch (err) {
+                if (err.message !== 'Unauthorized') console.error(err);
+            }
+        }
+
+        async function loadTodaySchedule() {
+            try {
+                const todayIso = toIsoDate(new Date());
+                const data = await apiFetch(`/schedule?start_date=${todayIso}&end_date=${todayIso}`);
+                appState.todaySchedule = {
+                    items: data.schedule || [],
+                    holiday: (data.holidays && data.holidays[todayIso]) || null
+                };
+            } catch (err) {
+                if (err.message !== 'Unauthorized') console.error(err);
+            }
+        }
+
+        async function loadWeekSchedule(anchorDate = appState.scheduleAnchorDate) {
+            try {
+                const monday = getMonday(anchorDate);
+                const sunday = new Date(monday);
+                sunday.setDate(monday.getDate() + 6);
+                const data = await apiFetch(`/schedule?start_date=${toIsoDate(monday)}&end_date=${toIsoDate(sunday)}`);
+                appState.weekSchedule = {
+                    items: data.schedule || [],
+                    holidays: data.holidays || {}
+                };
+            } catch (err) {
+                if (err.message !== 'Unauthorized') console.error(err);
+            }
+        }
+
+        async function loadGradesData() {
+            try {
+                appState.grades = await apiFetch('/grades');
+            } catch (err) {
+                if (err.message !== 'Unauthorized') console.error(err);
+            }
+        }
+
+        async function loadRequestsData() {
+            try {
+                appState.requests = await apiFetch('/requests');
+            } catch (err) {
+                if (err.message !== 'Unauthorized') console.error(err);
+            }
+        }
+
+        async function loadNotificationsData() {
+            try {
+                appState.notifications = await apiFetch('/notifications');
+                const hasUnread = appState.notifications.some(item => item.is_read === 0);
+                document.getElementById('notif-indicator').classList.toggle('hidden', !hasUnread);
+            } catch (err) {
+                if (err.message !== 'Unauthorized') console.error(err);
+            }
+        }
+
+       function gradeToNumeric(gradeText) {
+            const s = String(gradeText || '').trim().toLowerCase();
+            // Сначала проверяем "неудовлетворительно", т.к. оно содержит подстроку "удовлетворительно"
+            if (s.includes('неудовлетворительно') || s === '2') return 2;
+            if (s.includes('удовлетворительно') || s === '3') return 3;
+            if (s.includes('хорошо') || s === '4') return 4;
+            if (s.includes('отлично') || s === '5') return 5;
+            const parsed = parseFloat(s);
+            if (Number.isFinite(parsed) && parsed >= 2 && parsed <= 5) return parsed;
+            return null; // Зачет / Незачет не участвуют в 5-балльной шкале графика
+        }
+
+
+        function renderHomeNews() {
+            const container = document.getElementById('home-news-feed');
+            container.innerHTML = NEWS_ITEMS.map(item => `
+                <article class="rounded-xl bg-[#F2F2F5]/75 dark:bg-[#0A0A0C]/75 border border-zinc-200/80 dark:border-zinc-800/80 overflow-hidden transition-colors hover:border-[#4F46E5]/50 dark:hover:border-[#818CF8]/50">
+                    ${item.image ? `
+                        <div class="w-full h-36 sm:h-40 bg-zinc-200/60 dark:bg-zinc-900 overflow-hidden">
+                            <img src="${item.image}" onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='${item.fallbackImage}';}else{this.parentElement.classList.add('hidden');}" alt="${escapeHtml(item.title)}" class="w-full h-full object-cover">
+                        </div>
+                    ` : ''}
+                    <div class="p-4">
+                        <div class="flex items-center justify-between gap-2 mb-2">
+                            <span class="px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-[#4F46E5]/10 dark:bg-[#818CF8]/15 text-[#4F46E5] dark:text-[#818CF8]">${escapeHtml(item.tag)}</span>
+                            <span class="text-[11px] text-zinc-500 dark:text-zinc-400">${escapeHtml(item.date)}</span>
+                        </div>
+                        <h4 class="text-sm font-semibold leading-snug text-zinc-900 dark:text-zinc-100">${escapeHtml(item.title)}</h4>
+                        <p class="text-xs text-zinc-600 dark:text-zinc-400 mt-1.5 leading-relaxed">${escapeHtml(item.text)}</p>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        
+        function renderHomeGradesChart() {
+            const svg = document.getElementById('home-grades-svg');
+            const avgEl = document.getElementById('home-avg-score');
+            const subtitleEl = document.getElementById('home-grades-subtitle');
+            const infoEl = document.getElementById('home-grade-active-info');
+
+            const graded = (appState.grades || [])
+                .map(g => ({ ...g, score: gradeToNumeric(g.grade) }))
+                .filter(g => g.score !== null)
+                .sort((a, b) => a.semester - b.semester);
+
+            if (!graded.length) {
+                avgEl.textContent = '—';
+                subtitleEl.textContent = 'Дифференцированных оценок пока нет';
+                svg.innerHTML = `<text x="260" y="92" text-anchor="middle" fill="#71717a" font-size="14">Нет оценок по 5-балльной шкале</text>`;
+                infoEl.innerHTML = '<span class="text-zinc-500 dark:text-zinc-400">Оценки появятся после экзаменов</span>';
+                return;
+            }
+
+            const avg = graded.reduce((acc, g) => acc + g.score, 0) / graded.length;
+            avgEl.textContent = avg.toFixed(2);
+            subtitleEl.textContent = `Экзаменов с оценкой: ${graded.length}`;
+
+            const isDark = document.documentElement.classList.contains('dark');
+            const accentColor = isDark ? '#818CF8' : '#4F46E5';
+            const gridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(24,24,27,0.08)';
+            const labelColor = isDark ? '#a1a1aa' : '#71717a';
+            const dotBg = isDark ? '#131316' : '#FAFAFA';
+
+            const W = 520, H = 175;
+            const padLeft = 32, padRight = 22, padTop = 18, padBottom = 18;
+            const plotW = W - padLeft - padRight;
+            const plotH = H - padTop - padBottom;
+
+            const getY = val => padTop + ((5 - val) / 3) * plotH;
+            const getX = idx => graded.length === 1
+                ? padLeft + plotW / 2
+                : padLeft + (idx / (graded.length - 1)) * plotW;
+
+            // Сетка строго по шкале 5 / 4 / 3 / 2 (без накладывающихся подписей по оси X)
+            const gridLines = [5, 4, 3, 2].map(level => {
+                const y = getY(level);
+                return `
+                    <line x1="${padLeft}" y1="${y}" x2="${W - padRight}" y2="${y}" stroke="${gridColor}" stroke-dasharray="4 4" stroke-width="1" />
+                    <text x="${padLeft - 10}" y="${y + 4}" text-anchor="end" fill="${labelColor}" font-size="12" font-weight="500">${level}</text>
+                `;
+            }).join('');
+
+            const pts = graded.map((item, idx) => ({
+                x: getX(idx),
+                y: getY(item.score),
+                item
+            }));
+
+            // Плавная кривая Безье без выбросов за пределы 2..5
+            let linePath = '';
+            if (pts.length === 1) {
+                linePath = `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
+            } else {
+                linePath = `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
+                for (let i = 0; i < pts.length - 1; i++) {
+                    const p0 = pts[i];
+                    const p1 = pts[i + 1];
+                    const midX = ((p0.x + p1.x) / 2).toFixed(1);
+                    linePath += ` C ${midX} ${p0.y.toFixed(1)}, ${midX} ${p1.y.toFixed(1)}, ${p1.x.toFixed(1)} ${p1.y.toFixed(1)}`;
+                }
+            }
+
+            const bottomY = (H - padBottom).toFixed(1);
+            const areaPath = pts.length > 1
+                ? `${linePath} L ${pts[pts.length - 1].x.toFixed(1)} ${bottomY} L ${pts[0].x.toFixed(1)} ${bottomY} Z`
+                : '';
+
+            const dots = pts.map((p, idx) => `
+                <g class="cursor-pointer" onclick="showGradePointInfo(${idx})" onmouseenter="showGradePointInfo(${idx})">
+                    <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="15" fill="transparent" />
+                    <circle id="grade-ring-${idx}" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="9" fill="${accentColor}" opacity="0" class="transition-opacity duration-150" />
+                    <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="5" fill="${dotBg}" stroke="${accentColor}" stroke-width="2.5" />
+                </g>
+            `).join('');
+
+            svg.innerHTML = `
+                <defs>
+                    <linearGradient id="gradesAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="${accentColor}" stop-opacity="0.26" />
+                        <stop offset="100%" stop-color="${accentColor}" stop-opacity="0.0" />
+                    </linearGradient>
+                </defs>
+                ${gridLines}
+                ${areaPath ? `<path d="${areaPath}" fill="url(#gradesAreaGrad)" />` : ''}
+                ${pts.length > 1 ? `<path d="${linePath}" fill="none" stroke="${accentColor}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />` : ''}
+                ${dots}
+            `;
+
+            window.__chartGradesOrdered = graded;
+            showGradePointInfo(graded.length - 1);
+        }
+
+        function showGradePointInfo(index) {
+            const ordered = window.__chartGradesOrdered || [];
+            const item = ordered[index];
+            const infoEl = document.getElementById('home-grade-active-info');
+            if (!item || !infoEl) return;
+
+            ordered.forEach((_, idx) => {
+                const ring = document.getElementById(`grade-ring-${idx}`);
+                if (ring) ring.setAttribute('opacity', idx === index ? '0.22' : '0');
+            });
+
+            const badge = getGradeBadgeMeta(item.grade);
+            infoEl.innerHTML = `
+                <span class="font-medium text-zinc-900 dark:text-zinc-100 truncate">${escapeHtml(item.subject)}</span>
+                <span class="shrink-0 inline-flex items-center gap-1.5">
+                    <span class="px-2 py-0.5 rounded-md text-[11px] font-semibold ${badge.cls}">${escapeHtml(badge.label)}</span>
+                    <span class="text-[11px] text-zinc-500 dark:text-zinc-400">${item.semester} сем.</span>
+                </span>
+            `;
+        }
+        function getGradeBadgeMeta(gradeText) {
+            const score = gradeToNumeric(gradeText);
+            const s = String(gradeText || '').trim().toLowerCase();
+            if (score === 5) return { label: `${gradeText} (5)`, cls: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400', dot: '#10b981' };
+            if (score === 4) return { label: `${gradeText} (4)`, cls: 'bg-[#4F46E5]/15 dark:bg-[#818CF8]/20 text-[#4F46E5] dark:text-[#818CF8]', dot: '#4F46E5' };
+            if (score === 3) return { label: `${gradeText} (3)`, cls: 'bg-amber-500/15 text-amber-700 dark:text-amber-400', dot: '#f59e0b' };
+            if (score === 2) return { label: `${gradeText} (2)`, cls: 'bg-red-500/15 text-red-600 dark:text-red-400', dot: '#ef4444' };
+            if (s.includes('незачет') || s.includes('не зачтено')) return { label: gradeText, cls: 'bg-red-500/15 text-red-600 dark:text-red-400', dot: '#ef4444' };
+            if (s.includes('зачтено')) return { label: gradeText, cls: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400', dot: '#10b981' };
+            return { label: gradeText, cls: 'bg-zinc-200/70 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300', dot: '#71717a' };
+        }
+
+
+        function renderHomeSchedule(autoPickFirst = false) {
+            const today = new Date();
+            const jsDay = today.getDay();
+            const dayName = jsDay === 0 ? 'Воскресенье' : DAY_NAMES_FULL[jsDay - 1];
+
+            document.getElementById('home-today-label').textContent =
+                `${dayName}, ${today.getDate()} ${MONTHS_GENITIVE[today.getMonth()]}`;
+
+            const holidayName = appState.todaySchedule.holiday;
+            const isSunday = jsDay === 0;
+            const items = appState.todaySchedule.items || [];
+            const byPair = {};
+            items.forEach(item => { byPair[Number(item.pair_number)] = item; });
+
+            const countEl = document.getElementById('home-today-count');
+            if (holidayName) {
+                countEl.textContent = holidayName;
+            } else if (isSunday) {
+                countEl.textContent = 'Выходной';
+            } else {
+                const activeCount = items.filter(i => i.status !== 'cancelled').length;
+                countEl.textContent = items.length ? `Пар сегодня: ${activeCount}` : 'Сегодня пар нет';
+            }
+
+            if (autoPickFirst && items.length) {
+                appState.selectedTodayPair = Math.min(...items.map(i => Number(i.pair_number)));
+            }
+
+            const buttonsWrap = document.getElementById('home-pair-buttons');
+            buttonsWrap.innerHTML = [1, 2, 3, 4, 5].map(num => {
+                const isSelected = !holidayName && appState.selectedTodayPair === num;
+                const lesson = byPair[num];
+                const baseClasses = holidayName
+                    ? 'bg-[#F2F2F5]/60 dark:bg-[#0A0A0C]/60 text-zinc-400 dark:text-zinc-600 border-zinc-200/70 dark:border-zinc-800/70 cursor-not-allowed'
+                    : isSelected
+                        ? 'bg-[#4F46E5] dark:bg-[#818CF8] text-white dark:text-[#0A0A0C] border-transparent shadow-sm'
+                        : 'bg-[#F2F2F5] dark:bg-[#0A0A0C] text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-800 hover:border-[#4F46E5] dark:hover:border-[#818CF8]';
+
+                let dotClass = '';
+                if (lesson) {
+                    if (lesson.status === 'cancelled') {
+                        dotClass = isSelected ? 'bg-red-200 dark:bg-red-900' : 'bg-red-500';
+                    } else if (lesson.status === 'rescheduled') {
+                        dotClass = isSelected ? 'bg-orange-200 dark:bg-orange-900' : 'bg-orange-500';
+                    } else {
+                        dotClass = isSelected ? 'bg-white dark:bg-[#0A0A0C]' : 'bg-[#4F46E5] dark:bg-[#818CF8]';
+                    }
+                }
+
+                return `
+                    <button type="button" ${holidayName ? 'disabled' : `onclick="selectHomePair(${num})"`} class="relative h-11 rounded-xl border font-semibold text-sm flex items-center justify-center transition-all ${baseClasses}">
+                        <span>${num}</span>
+                        ${lesson ? `<span class="absolute bottom-1.5 w-1.5 h-1.5 rounded-full ${dotClass}"></span>` : ''}
+                    </button>
+                `;
+            }).join('');
+
+            const detailEl = document.getElementById('home-pair-detail');
+            const selectedNum = appState.selectedTodayPair;
+            const slot = PAIR_TIMES[selectedNum];
+            const pairData = byPair[selectedNum];
+
+            if (holidayName) {
+                detailEl.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="w-9 h-9 rounded-xl bg-[#4F46E5]/10 dark:bg-[#818CF8]/15 text-[#4F46E5] dark:text-[#818CF8] flex items-center justify-center shrink-0">
+                            <i data-lucide="sparkles" class="w-5 h-5"></i>
+                        </span>
+                        <div class="min-w-0">
+                            <p class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">${escapeHtml(holidayName)}</p>
+                            <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Учебных занятий нет.</p>
+                        </div>
+                    </div>
+                `;
+            } else if (isSunday) {
+                detailEl.innerHTML = `
+                    <div class="flex items-center gap-3 text-zinc-500 dark:text-zinc-400">
+                        <i data-lucide="coffee" class="w-5 h-5 text-[#4F46E5] dark:text-[#818CF8] shrink-0"></i>
+                        <div>
+                            <p class="text-sm font-medium text-zinc-800 dark:text-zinc-200">Воскресенье — выходной день</p>
+                            <p class="text-xs mt-0.5">Занятия начнутся в понедельник.</p>
+                        </div>
+                    </div>
+                `;
+            } else if (pairData) {
+                const isCancelled = pairData.status === 'cancelled';
+                const isRescheduled = pairData.status === 'rescheduled';
+                const reasonText = pairData.comment || pairData.reason || '';
+                const timeChanged = isRescheduled && (
+                    pairData.original_start_time !== pairData.start_time ||
+                    pairData.original_end_time !== pairData.end_time
+                );
+                const roomChanged = isRescheduled && pairData.original_room !== pairData.room;
+
+                detailEl.innerHTML = `
+                    <div class="min-w-0 ${isCancelled ? 'opacity-60' : ''}">
+                        <div class="flex flex-wrap items-center gap-2 text-xs font-medium">
+                            ${isCancelled ? `<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-red-500/15 text-red-600 dark:text-red-400">Отменена</span>` : ''}
+                            ${isRescheduled ? `<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-orange-500/15 text-orange-600 dark:text-orange-400">Перенос</span>` : ''}
+                            <span class="text-[#4F46E5] dark:text-[#818CF8]">${selectedNum}-я пара</span>
+                            <span class="text-zinc-400">•</span>
+                            ${timeChanged
+                                ? `<span class="line-through text-zinc-400">${escapeHtml(pairData.original_start_time)}–${escapeHtml(pairData.original_end_time)}</span>
+                                   <span class="font-semibold text-orange-600 dark:text-orange-400">${escapeHtml(pairData.start_time)}–${escapeHtml(pairData.end_time)}</span>`
+                                : `<span class="${isCancelled ? 'line-through text-zinc-400' : 'text-[#4F46E5] dark:text-[#818CF8]'}">${escapeHtml(pairData.start_time)} – ${escapeHtml(pairData.end_time)}</span>`
+                            }
+                        </div>
+                        <h4 class="text-base font-semibold text-zinc-900 dark:text-zinc-100 mt-1.5 break-words ${isCancelled ? 'line-through' : ''}">
+                            ${escapeHtml(pairData.subject)}
+                        </h4>
+                        <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5 text-xs text-zinc-500 dark:text-zinc-400">
+                            <span class="inline-flex items-center gap-1 min-w-0">
+                                <i data-lucide="user" class="w-3.5 h-3.5 shrink-0"></i>
+                                <span class="break-words">${escapeHtml(pairData.teacher)}</span>
+                            </span>
+                            <span class="inline-flex items-center gap-1.5 flex-wrap">
+                                <i data-lucide="map-pin" class="w-3.5 h-3.5 shrink-0"></i>
+                                ${roomChanged
+                                    ? `<span class="line-through text-zinc-400">${escapeHtml(pairData.original_room)}</span>
+                                       <span class="font-semibold text-orange-600 dark:text-orange-400">${escapeHtml(pairData.room)}</span>`
+                                    : `<span class="${isCancelled ? 'line-through' : ''}">${escapeHtml(pairData.room)}</span>`
+                                }
+                            </span>
+                        </div>
+                        ${reasonText ? `
+                            <p class="mt-2 pt-2 border-t border-zinc-200/70 dark:border-zinc-800/70 text-xs leading-snug break-words ${isCancelled ? 'text-red-600 dark:text-red-400' : 'text-orange-600 dark:text-orange-400'}">
+                                Причина: ${escapeHtml(reasonText)}
+                            </p>
+                        ` : ''}
+                    </div>
+                `;
+            } else {
+                detailEl.innerHTML = `
+                    <div>
+                        <div class="text-xs font-medium text-zinc-500 dark:text-zinc-400">${selectedNum}-я пара • ${slot.start} – ${slot.end}</div>
+                        <p class="text-sm font-medium text-zinc-700 dark:text-zinc-300 mt-1">На этой паре занятий нет</p>
+                    </div>
+                `;
+            }
+
+            lucide.createIcons();
+        }
+
+        function selectHomePair(num) {
+            appState.selectedTodayPair = num;
+            renderHomeSchedule(false);
+        }
+
+        // --- ПОЛНОЕ РАСПИСАНИЕ СТУДЕНТА ---
+        function renderFullSchedulePage() {
+            const monday = getMonday(appState.scheduleAnchorDate);
+            const today = new Date();
+            const list = appState.weekSchedule.items || [];
+            const holidays = appState.weekSchedule.holidays || {};
+
+            document.getElementById('schedule-week-range').textContent = formatWeekRange(monday);
+
+            const grid = document.getElementById('schedule-week-grid');
+            let html = '';
+
+            for (let i = 0; i < 6; i++) {
+                const dayDate = new Date(monday);
+                dayDate.setDate(monday.getDate() + i);
+                const dateIso = toIsoDate(dayDate);
+                const isToday = isSameDay(dayDate, today);
+                const holidayName = holidays[dateIso];
+
+                const dayLessons = list
+                    .filter(item => item.date === dateIso)
+                    .sort((a, b) => Number(a.pair_number) - Number(b.pair_number));
+
+                html += `
+                    <div class="bg-[#FAFAFA] dark:bg-[#131316] border ${isToday ? 'border-[#4F46E5] dark:border-[#818CF8]' : 'border-zinc-200 dark:border-zinc-800'} rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col min-w-0">
+                        <div class="flex items-center justify-between gap-2 pb-3 mb-3 border-b border-zinc-200/80 dark:border-zinc-800/80">
+                            <div class="min-w-0">
+                                <h4 class="text-base font-semibold">${DAY_NAMES_FULL[i]}</h4>
+                                <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">${dayDate.getDate()} ${MONTHS_GENITIVE[dayDate.getMonth()]}</p>
+                            </div>
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                ${holidayName ? `<span class="px-2.5 py-0.5 rounded-lg text-[11px] font-semibold bg-[#4F46E5]/10 dark:bg-[#818CF8]/15 text-[#4F46E5] dark:text-[#818CF8]">Каникулы</span>` : ''}
+                                ${isToday ? `<span class="px-2.5 py-0.5 rounded-lg text-[11px] font-semibold bg-[#4F46E5] dark:bg-[#818CF8] text-white dark:text-[#0A0A0C]">Сегодня</span>` : ''}
+                            </div>
+                        </div>
+
+                        <div class="space-y-2.5 flex-1">
+                            ${holidayName ? `
+                                <div class="h-full min-h-[96px] rounded-xl bg-[#4F46E5]/5 dark:bg-[#818CF8]/10 border border-[#4F46E5]/15 dark:border-[#818CF8]/20 p-4 flex flex-col items-center justify-center text-center gap-1.5">
+                                    <i data-lucide="sparkles" class="w-5 h-5 text-[#4F46E5] dark:text-[#818CF8]"></i>
+                                    <div class="text-sm font-semibold text-zinc-800 dark:text-zinc-100">${escapeHtml(holidayName)}</div>
+                                    <div class="text-xs text-zinc-500 dark:text-zinc-400">Занятий нет</div>
+                                </div>
+                            ` : dayLessons.length ? dayLessons.map(lesson => {
+                                const isCancelled = lesson.status === 'cancelled';
+                                const isRescheduled = lesson.status === 'rescheduled';
+                                const reasonText = lesson.comment || lesson.reason || '';
+                                const timeChanged = isRescheduled && (
+                                    lesson.original_start_time !== lesson.start_time ||
+                                    lesson.original_end_time !== lesson.end_time
+                                );
+                                const roomChanged = isRescheduled && lesson.original_room !== lesson.room;
+
+                                const cardStyle = isCancelled
+                                    ? 'opacity-55 bg-[#F2F2F5]/60 dark:bg-[#0A0A0C]/60 border-red-500/35'
+                                    : isRescheduled
+                                        ? 'bg-[#F2F2F5]/80 dark:bg-[#0A0A0C]/80 border-orange-500/45'
+                                        : 'bg-[#F2F2F5]/80 dark:bg-[#0A0A0C]/80 border-zinc-200/70 dark:border-zinc-800/70';
+
+                                const stripeStyle = isCancelled
+                                    ? 'border-red-500/50'
+                                    : isRescheduled
+                                        ? 'border-orange-500'
+                                        : 'border-[#4F46E5]/50 dark:border-[#818CF8]/50';
+
+                                return `
+                                    <div class="rounded-xl border p-3 flex flex-col gap-2 min-w-0 ${cardStyle}">
+                                        ${(isCancelled || isRescheduled) ? `
+                                            <div class="flex items-center justify-between gap-2">
+                                                ${isCancelled
+                                                    ? `<span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-red-500/15 text-red-600 dark:text-red-400">Отменена</span>`
+                                                    : `<span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-orange-500/15 text-orange-600 dark:text-orange-400">Перенос</span>`
+                                                }
+                                                <span class="text-[11px] text-zinc-400">${lesson.pair_number}-я пара</span>
+                                            </div>
+                                        ` : ''}
+
+                                        <div class="flex gap-2.5 sm:gap-3 min-w-0">
+                                            <div class="shrink-0 w-12 text-center pt-0.5">
+                                                ${timeChanged ? `
+                                                    <div class="text-[10px] line-through text-zinc-400 leading-tight">${escapeHtml(lesson.original_start_time)}</div>
+                                                    <div class="text-xs font-semibold text-orange-600 dark:text-orange-400 leading-tight mt-0.5">${escapeHtml(lesson.start_time)}</div>
+                                                    <div class="text-[11px] text-orange-600/80 dark:text-orange-400/80 leading-tight">${escapeHtml(lesson.end_time)}</div>
+                                                ` : `
+                                                    <div class="text-xs font-semibold ${isCancelled ? 'text-zinc-500 line-through' : 'text-[#4F46E5] dark:text-[#818CF8]'}">${escapeHtml(lesson.start_time)}</div>
+                                                    <div class="text-[11px] text-zinc-500 dark:text-zinc-400 ${isCancelled ? 'line-through' : ''}">${escapeHtml(lesson.end_time)}</div>
+                                                `}
+                                            </div>
+
+                                            <div class="min-w-0 flex-1 border-l-2 ${stripeStyle} pl-2.5 sm:pl-3">
+                                                <div class="text-sm font-semibold leading-snug break-words text-zinc-900 dark:text-zinc-100 ${isCancelled ? 'line-through' : ''}">
+                                                    ${escapeHtml(lesson.subject)}
+                                                </div>
+                                                <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+                                                    <span class="break-words">${escapeHtml(lesson.teacher)}</span>
+                                                    <span>•</span>
+                                                    ${roomChanged ? `
+                                                        <span class="inline-flex items-center gap-1.5 flex-wrap">
+                                                            <span class="line-through text-zinc-400">${escapeHtml(lesson.original_room)}</span>
+                                                            <span class="font-semibold text-orange-600 dark:text-orange-400">${escapeHtml(lesson.room)}</span>
+                                                        </span>
+                                                    ` : `
+                                                        <span class="font-medium text-zinc-700 dark:text-zinc-300 ${isCancelled ? 'line-through' : ''}">${escapeHtml(lesson.room)}</span>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        ${reasonText ? `
+                                            <div class="pt-1.5 border-t border-zinc-200/70 dark:border-zinc-800/70 text-[11px] leading-snug break-words ${isCancelled ? 'text-red-600 dark:text-red-400' : 'text-orange-600 dark:text-orange-400'}">
+                                                ${escapeHtml(reasonText)}
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                `;
+                            }).join('') : `
+                                <div class="h-full min-h-[72px] flex items-center justify-center text-xs text-zinc-500 dark:text-zinc-400">Занятий нет</div>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }
+
+            grid.innerHTML = html;
+            if (appState.calendarOpen) renderScheduleCalendar();
+            lucide.createIcons();
+        }
+
+        async function shiftScheduleWeek(deltaWeeks) {
+            const next = new Date(appState.scheduleAnchorDate);
+            next.setDate(next.getDate() + deltaWeeks * 7);
+            appState.scheduleAnchorDate = next;
+            appState.calendarViewDate = new Date(next);
+            await loadWeekSchedule(next);
+            renderFullSchedulePage();
+        }
+
+        async function resetScheduleToToday() {
+            appState.scheduleAnchorDate = new Date();
+            appState.calendarViewDate = new Date();
+            await loadWeekSchedule(appState.scheduleAnchorDate);
+            renderFullSchedulePage();
+        }
+
+        function toggleScheduleCalendar() {
+            appState.calendarOpen = !appState.calendarOpen;
+            const popover = document.getElementById('schedule-calendar-popover');
+            popover.classList.toggle('hidden', !appState.calendarOpen);
+            if (appState.calendarOpen) {
+                appState.calendarViewDate = new Date(appState.scheduleAnchorDate);
+                renderScheduleCalendar();
+            }
+        }
+
+        function shiftCalendarMonth(deltaMonths) {
+            const d = new Date(appState.calendarViewDate);
+            d.setDate(1);
+            d.setMonth(d.getMonth() + deltaMonths);
+            appState.calendarViewDate = d;
+            renderScheduleCalendar();
+        }
+
+        async function pickCalendarDate(year, month, day) {
+            appState.scheduleAnchorDate = new Date(year, month, day);
+            appState.calendarViewDate = new Date(year, month, day);
+            appState.calendarOpen = false;
+            document.getElementById('schedule-calendar-popover').classList.add('hidden');
+            await loadWeekSchedule(appState.scheduleAnchorDate);
+            renderFullSchedulePage();
+        }
+
+        function renderScheduleCalendar() {
+            const viewDate = appState.calendarViewDate;
+            const year = viewDate.getFullYear();
+            const month = viewDate.getMonth();
+            const today = new Date();
+
+            const selectedMonday = getMonday(appState.scheduleAnchorDate);
+            const selectedSunday = new Date(selectedMonday);
+            selectedSunday.setDate(selectedMonday.getDate() + 6);
+
+            document.getElementById('calendar-month-label').textContent = `${MONTHS_NOMINATIVE[month]} ${year}`;
+
+            const firstDayJs = new Date(year, month, 1).getDay();
+            const offset = firstDayJs === 0 ? 6 : firstDayJs - 1;
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            let cells = '';
+            for (let i = 0; i < offset; i++) cells += `<div></div>`;
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const cellDate = new Date(year, month, day);
+                cellDate.setHours(0, 0, 0, 0);
+                const inSelectedWeek = cellDate >= selectedMonday && cellDate <= selectedSunday;
+                const isToday = isSameDay(cellDate, today);
+
+                let cls = 'h-8 w-8 mx-auto rounded-lg flex items-center justify-center transition-colors ';
+                if (isToday) {
+                    cls += 'bg-[#4F46E5] dark:bg-[#818CF8] text-white dark:text-[#0A0A0C] font-bold';
+                } else if (inSelectedWeek) {
+                    cls += 'bg-[#4F46E5]/15 dark:bg-[#818CF8]/20 text-[#4F46E5] dark:text-[#818CF8] font-semibold';
+                } else {
+                    cls += 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200/70 dark:hover:bg-zinc-800';
+                }
+
+                cells += `<button type="button" onclick="pickCalendarDate(${year}, ${month}, ${day})" class="${cls}">${day}</button>`;
+            }
+            document.getElementById('calendar-days-grid').innerHTML = cells;
+        }
+
+        document.addEventListener('click', (event) => {
+            if (!appState.calendarOpen) return;
+            const popover = document.getElementById('schedule-calendar-popover');
+            const toggleBtn = document.getElementById('calendar-toggle-btn');
+            if (popover && toggleBtn && !popover.contains(event.target) && !toggleBtn.contains(event.target)) {
+                appState.calendarOpen = false;
+                popover.classList.add('hidden');
+            }
+        });
+
+        // --- УСПЕВАЕМОСТЬ СТУДЕНТА ---
+        function selectSemester(sem) {
+            appState.selectedSemester = sem;
+            renderGradesPage();
+        }
+
+        function renderGradesPage() {
+            const grades = appState.grades || [];
+            if (appState.selectedSemester === null) {
+                const hasSem1 = grades.some(g => Number(g.semester) === 1);
+                const hasSem2 = grades.some(g => Number(g.semester) === 2);
+                appState.selectedSemester = hasSem1 ? 1 : (hasSem2 ? 2 : 1);
+            }
+
+            const activeSem = appState.selectedSemester;
+            document.querySelectorAll('.semester-tab').forEach(btn => {
+                const isSelected = Number(btn.dataset.semester) === activeSem;
+                btn.classList.toggle('bg-[#4F46E5]', isSelected);
+                btn.classList.toggle('dark:bg-[#818CF8]', isSelected);
+                btn.classList.toggle('text-white', isSelected);
+                btn.classList.toggle('dark:text-[#0A0A0C]', isSelected);
+                btn.classList.toggle('text-zinc-600', !isSelected);
+                btn.classList.toggle('dark:text-zinc-400', !isSelected);
+            });
+
+            const semGrades = grades.filter(g => Number(g.semester) === activeSem);
+            const numeric = semGrades.map(g => gradeToNumeric(g.grade)).filter(v => v !== null);
+            const avg = numeric.length ? (numeric.reduce((a, b) => a + b, 0) / numeric.length).toFixed(2) : '—';
+            const examsCount = semGrades.filter(g => String(g.assessment_type).toLowerCase().includes('экзамен')).length;
+            const testsCount = semGrades.length - examsCount;
+
+            document.getElementById('grades-semester-stats').innerHTML = `
+                <div class="rounded-xl bg-[#F2F2F5]/80 dark:bg-[#0A0A0C]/80 border border-zinc-200/70 dark:border-zinc-800/70 p-3.5">
+                    <div class="text-xs text-zinc-500 dark:text-zinc-400">Средний балл</div>
+                    <div class="text-xl font-bold text-[#4F46E5] dark:text-[#818CF8] mt-1">${avg}</div>
+                </div>
+                <div class="rounded-xl bg-[#F2F2F5]/80 dark:bg-[#0A0A0C]/80 border border-zinc-200/70 dark:border-zinc-800/70 p-3.5">
+                    <div class="text-xs text-zinc-500 dark:text-zinc-400">Всего дисциплин</div>
+                    <div class="text-xl font-bold mt-1">${semGrades.length}</div>
+                </div>
+                <div class="col-span-2 sm:col-span-1 rounded-xl bg-[#F2F2F5]/80 dark:bg-[#0A0A0C]/80 border border-zinc-200/70 dark:border-zinc-800/70 p-3.5">
+                    <div class="text-xs text-zinc-500 dark:text-zinc-400">Экзамены / Зачёты</div>
+                    <div class="text-xl font-bold mt-1">${examsCount} / ${testsCount}</div>
+                </div>
+            `;
+
+            const listEl = document.getElementById('grades-semester-list');
+            if (!semGrades.length) {
+                listEl.innerHTML = `<div class="p-8 text-center text-sm text-zinc-500 dark:text-zinc-400">За ${activeSem} семестр записей пока нет.</div>`;
+                return;
+            }
+
+            listEl.innerHTML = semGrades.map(item => {
+                const badge = getGradeBadgeMeta(item.grade);
+                return `
+                    <div class="p-4 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-[#F2F2F5]/60 dark:hover:bg-[#0A0A0C]/50 transition-colors">
+                        <div class="min-w-0">
+                            <div class="text-sm sm:text-base font-medium text-zinc-900 dark:text-zinc-100 break-words">${escapeHtml(item.subject)}</div>
+                            <div class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 capitalize">${escapeHtml(item.assessment_type)}</div>
+                        </div>
+                        <span class="self-start sm:self-center shrink-0 px-3 py-1 rounded-lg text-xs font-semibold ${badge.cls}">${escapeHtml(badge.label)}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // --- ПРОФИЛЬ, ЗАЯВКИ И УВЕДОМЛЕНИЯ СТУДЕНТА ---
+        function renderStudentProfilePage() {
+            const p = appState.profile;
+            if (!p) return;
+            document.getElementById('profile-fullname').textContent = p.full_name;
+            const fields = [
+                { label: 'Факультет', value: p.faculty },
+                { label: 'Учебная группа', value: p.group_name },
+                { label: 'Номер зачётной книжки', value: p.grade_book },
+                { label: 'Логин', value: appState.me ? appState.me.username : '—' }
+            ];
+            document.getElementById('profile-details-grid').innerHTML = fields.map(f => `
+                <div class="rounded-xl bg-[#F2F2F5]/80 dark:bg-[#0A0A0C]/80 border border-zinc-200/70 dark:border-zinc-800/70 p-4">
+                    <div class="text-xs text-zinc-500 dark:text-zinc-400">${escapeHtml(f.label)}</div>
+                    <div class="text-sm font-semibold mt-1 break-words">${escapeHtml(f.value)}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderStudentRequestsPage() {
+            const container = document.getElementById('student-requests-list');
+            const items = appState.requests || [];
+            if (!items.length) {
+                container.innerHTML = `<div class="py-8 text-center text-sm text-zinc-500 dark:text-zinc-400">У вас пока нет заявок на справки.</div>`;
+                return;
+            }
+            container.innerHTML = items.map(req => {
+                const st = getStatusMeta(req.status);
+                return `
+                    <div class="rounded-xl bg-[#F2F2F5]/80 dark:bg-[#0A0A0C]/80 border border-zinc-200/70 dark:border-zinc-800/70 p-4 flex flex-col gap-2">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <div class="text-sm font-semibold break-words">${escapeHtml(req.request_type)}</div>
+                            <span class="px-2.5 py-0.5 rounded-lg text-xs font-semibold shrink-0 ${st.cls}">${st.label}</span>
+                        </div>
+                        <div class="text-xs text-zinc-500 dark:text-zinc-400">Подана: ${escapeHtml(formatDateTime(req.created_at))}</div>
+                        ${req.admin_comment ? `
+                            <div class="pt-2 border-t border-zinc-200/70 dark:border-zinc-800/70 text-xs text-zinc-700 dark:text-zinc-300 break-words">
+                                <span class="font-medium text-[#4F46E5] dark:text-[#818CF8]">Комментарий деканата:</span> ${escapeHtml(req.admin_comment)}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateNotificationIndicator() {
+            const hasUnread = (appState.notifications || []).some(item => Number(item.is_read) === 0);
+            const indicator = document.getElementById('notif-indicator');
+            if (indicator) indicator.classList.toggle('hidden', !hasUnread);
+        }
+
+        function renderStudentNotificationsPage() {
+            const container = document.getElementById('student-notifications-list');
+            const items = appState.notifications || [];
+            updateNotificationIndicator();
+
+            if (!items.length) {
+                container.innerHTML = `<div class="py-8 text-center text-sm text-zinc-500 dark:text-zinc-400">Уведомлений пока нет.</div>`;
+                return;
+            }
+
+            container.innerHTML = items.map(n => {
+                const isUnread = Number(n.is_read) === 0;
+                return `
+                    <div
+                        ${isUnread ? `onclick="markNotificationRead(${n.id})" role="button" tabindex="0"` : ''}
+                        class="rounded-xl bg-[#F2F2F5]/80 dark:bg-[#0A0A0C]/80 border p-4 transition-all ${
+                            isUnread
+                                ? 'border-[#4F46E5]/50 dark:border-[#818CF8]/50 cursor-pointer hover:border-[#4F46E5] dark:hover:border-[#818CF8]'
+                                : 'border-zinc-200/70 dark:border-zinc-800/70 opacity-80'
+                        }"
+                    >
+                        <div class="flex items-start justify-between gap-3">
+                            <p class="text-sm leading-relaxed break-words ${isUnread ? 'font-medium text-zinc-900 dark:text-zinc-100' : 'text-zinc-600 dark:text-zinc-400'}">
+                                ${escapeHtml(n.message)}
+                            </p>
+                            ${isUnread ? `<span class="w-2.5 h-2.5 rounded-full bg-[#4F46E5] dark:bg-[#818CF8] shrink-0 mt-1.5"></span>` : ''}
+                        </div>
+                        <div class="flex items-center justify-between gap-2 mt-2">
+                            <span class="text-[11px] text-zinc-500 dark:text-zinc-400">${escapeHtml(formatDateTime(n.created_at))}</span>
+                            <span class="text-[11px] ${isUnread ? 'font-medium text-[#4F46E5] dark:text-[#818CF8]' : 'text-zinc-400 dark:text-zinc-500'}">
+                                ${isUnread ? 'Новое • нажмите, чтобы прочитать' : 'Прочитано'}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function markNotificationRead(notificationId) {
+            const target = (appState.notifications || []).find(n => n.id === notificationId);
+            if (!target || Number(target.is_read) === 1) return;
+
+            try {
+                await apiFetch(`/notifications/${notificationId}/read`, { method: 'PATCH' });
+                target.is_read = 1;
+                renderStudentNotificationsPage();
+            } catch (err) {
+                if (err.message !== 'Unauthorized') showToast(err.message, 'error');
+            }
+        }
+
+
+        document.getElementById('student-request-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const select = document.getElementById('student-request-type');
+            if (!select.value) return;
+            try {
+                await apiFetch('/requests', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ request_type: select.value })
+                });
+                select.value = '';
+                await loadRequestsData();
+                renderStudentRequestsPage();
+                showToast('Заявка на справку отправлена в деканат');
+            } catch (err) {
+                if (err.message !== 'Unauthorized') showToast(err.message, 'error');
+            }
+        });
+
+        // =============================================================
+        // ================== ЛОГИКА АДМИНИСТРАТОРА ====================
+        // =============================================================
+
+        async function loadAdminGroups() {
+            try {
+                const data = await apiFetch('/admin/groups');
+                appState.adminGroups = data.groups || [];
+                const datalist = document.getElementById('admin-groups-datalist');
+                if (datalist) {
+                    datalist.innerHTML = appState.adminGroups.map(g => `<option value="${escapeHtml(g)}"></option>`).join('');
+                }
+            } catch (err) {
+                if (err.message !== 'Unauthorized') showToast(err.message, 'error');
+            }
+        }
+
+        async function loadAdminStudents() {
+            try {
+                appState.adminStudents = await apiFetch('/admin/students');
+            } catch (err) {
+                if (err.message !== 'Unauthorized') showToast(err.message, 'error');
+            }
+        }
+
+        // --- 1. АДМИН: РАСПИСАНИЕ И ПЕРЕНОСЫ ---
+        async function initAdminSchedulePage() {
+            await loadAdminGroups();
+            const groupSelect = document.getElementById('admin-schedule-group');
+            const prevValue = groupSelect.value;
+            groupSelect.innerHTML = appState.adminGroups.length
+                ? appState.adminGroups.map(g => `<option value="${escapeHtml(g)}">${escapeHtml(g)}</option>`).join('')
+                : `<option value="">Нет доступных групп</option>`;
+            if (prevValue && appState.adminGroups.includes(prevValue)) {
+                groupSelect.value = prevValue;
+            }
+
+            const dateInput = document.getElementById('admin-schedule-date');
+            if (!dateInput.value) {
+                dateInput.value = toIsoDate(new Date());
+            }
+            await loadAdminScheduleForDate();
+        }
+
+        function setAdminScheduleToday() {
+            document.getElementById('admin-schedule-date').value = toIsoDate(new Date());
+            loadAdminScheduleForDate();
+        }
+
+        function shiftAdminScheduleDate(deltaDays) {
+            const input = document.getElementById('admin-schedule-date');
+            const current = input.value ? parseIsoDate(input.value) : new Date();
+            current.setDate(current.getDate() + deltaDays);
+            input.value = toIsoDate(current);
+            loadAdminScheduleForDate();
+        }
+
+        async function loadAdminScheduleForDate() {
+            const groupName = document.getElementById('admin-schedule-group').value;
+            const dateStr = document.getElementById('admin-schedule-date').value;
+            const listEl = document.getElementById('admin-schedule-list');
+            const titleEl = document.getElementById('admin-schedule-day-title');
+            const metaEl = document.getElementById('admin-schedule-day-meta');
+
+            appState.adminActiveEditor = null;
+            if (!groupName || !dateStr) {
+                listEl.innerHTML = `<div class="py-6 text-center text-sm text-zinc-500 dark:text-zinc-400">Выберите группу и дату.</div>`;
+                return;
+            }
+
+            listEl.innerHTML = `<div class="py-6 text-center text-sm text-zinc-500 dark:text-zinc-400">Загрузка расписания...</div>`;
+
+            try {
+                const params = new URLSearchParams({ group_name: groupName, date: dateStr });
+                const data = await apiFetch(`/admin/schedule?${params.toString()}`);
+                appState.adminScheduleData = data;
+
+                const dt = parseIsoDate(dateStr);
+                const jsDay = dt.getDay();
+                const dayName = jsDay === 0 ? 'Воскресенье' : DAY_NAMES_FULL[jsDay - 1];
+                titleEl.textContent = `${dayName}, ${dt.getDate()} ${MONTHS_GENITIVE[dt.getMonth()]} ${dt.getFullYear()}`;
+                metaEl.textContent = `${groupName}`;
+
+                renderAdminScheduleList();
+            } catch (err) {
+                if (err.message !== 'Unauthorized') {
+                    listEl.innerHTML = `<div class="py-6 text-center text-sm text-red-500">${escapeHtml(err.message)}</div>`;
+                }
+            }
+        }
+
+        function openAdminScheduleEditor(scheduleId, mode) {
+            if (
+                appState.adminActiveEditor &&
+                appState.adminActiveEditor.scheduleId === scheduleId &&
+                appState.adminActiveEditor.mode === mode
+            ) {
+                appState.adminActiveEditor = null;
+            } else {
+                appState.adminActiveEditor = { scheduleId, mode };
+            }
+            renderAdminScheduleList();
+        }
+
+        function closeAdminScheduleEditor() {
+            appState.adminActiveEditor = null;
+            renderAdminScheduleList();
+        }
+
+        function renderAdminScheduleList() {
+            const data = appState.adminScheduleData;
+            const listEl = document.getElementById('admin-schedule-list');
+            if (!data) return;
+
+            if (data.holiday) {
+                listEl.innerHTML = `
+                    <div class="rounded-xl bg-[#4F46E5]/5 dark:bg-[#818CF8]/10 border border-[#4F46E5]/20 dark:border-[#818CF8]/25 p-6 text-center">
+                        <i data-lucide="sparkles" class="w-6 h-6 mx-auto text-[#4F46E5] dark:text-[#818CF8] mb-2"></i>
+                        <div class="text-sm font-semibold">${escapeHtml(data.holiday)}</div>
+                        <div class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">В каникулярные дни учебные пары не проводятся.</div>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            if (data.is_sunday) {
+                listEl.innerHTML = `
+                    <div class="rounded-xl bg-[#F2F2F5]/80 dark:bg-[#0A0A0C]/80 border border-zinc-200/70 dark:border-zinc-800/70 p-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
+                        Воскресенье — выходной день, занятий нет.
+                    </div>
+                `;
+                return;
+            }
+
+            const lessons = data.schedule || [];
+            if (!lessons.length) {
+                listEl.innerHTML = `
+                    <div class="rounded-xl bg-[#F2F2F5]/80 dark:bg-[#0A0A0C]/80 border border-zinc-200/70 dark:border-zinc-800/70 p-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
+                        У этой группы на выбранную дату пар нет.
+                    </div>
+                `;
+                return;
+            }
+
+            listEl.innerHTML = lessons.map(lesson => {
+                const isCancelled = lesson.status === 'cancelled';
+                const isRescheduled = lesson.status === 'rescheduled';
+                const isModified = isCancelled || isRescheduled;
+                const timeChanged = isRescheduled && (
+                    lesson.original_start_time !== lesson.start_time ||
+                    lesson.original_end_time !== lesson.end_time
+                );
+                const roomChanged = isRescheduled && lesson.original_room !== lesson.room;
+
+                const editor = appState.adminActiveEditor && appState.adminActiveEditor.scheduleId === lesson.schedule_id
+                    ? appState.adminActiveEditor
+                    : null;
+
+                const borderCls = isCancelled
+                    ? 'border-red-500/35 bg-[#F2F2F5]/60 dark:bg-[#0A0A0C]/60'
+                    : isRescheduled
+                        ? 'border-orange-500/40 bg-[#F2F2F5]/80 dark:bg-[#0A0A0C]/80'
+                        : 'border-zinc-200/80 dark:border-zinc-800/80 bg-[#F2F2F5]/80 dark:bg-[#0A0A0C]/80';
+
+                return `
+                    <div class="rounded-2xl border p-4 transition-colors ${borderCls}">
+                        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                            <div class="min-w-0 flex-1 ${isCancelled ? 'opacity-65' : ''}">
+                                <div class="flex flex-wrap items-center gap-2 text-xs">
+                                    <span class="font-semibold text-[#4F46E5] dark:text-[#818CF8]">${lesson.pair_number}-я пара</span>
+                                    <span class="text-zinc-400">•</span>
+                                    ${timeChanged ? `
+                                        <span class="line-through text-zinc-400">${escapeHtml(lesson.original_start_time)}–${escapeHtml(lesson.original_end_time)}</span>
+                                        <span class="font-semibold text-orange-600 dark:text-orange-400">${escapeHtml(lesson.start_time)}–${escapeHtml(lesson.end_time)}</span>
+                                    ` : `
+                                        <span class="${isCancelled ? 'line-through text-zinc-400' : 'text-zinc-600 dark:text-zinc-300'}">${escapeHtml(lesson.start_time)}–${escapeHtml(lesson.end_time)}</span>
+                                    `}
+                                    ${isCancelled ? `<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-red-500/15 text-red-600 dark:text-red-400">Отменена</span>` : ''}
+                                    ${isRescheduled ? `<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-orange-500/15 text-orange-600 dark:text-orange-400">Перенос</span>` : ''}
+                                </div>
+
+                                <h5 class="text-base font-semibold mt-1.5 break-words ${isCancelled ? 'line-through' : ''}">${escapeHtml(lesson.subject)}</h5>
+
+                                <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-zinc-500 dark:text-zinc-400">
+                                    <span class="inline-flex items-center gap-1">
+                                        <i data-lucide="user" class="w-3.5 h-3.5 shrink-0"></i>
+                                        <span>${escapeHtml(lesson.teacher)}</span>
+                                    </span>
+                                    <span class="inline-flex items-center gap-1.5 flex-wrap">
+                                        <i data-lucide="map-pin" class="w-3.5 h-3.5 shrink-0"></i>
+                                        ${roomChanged ? `
+                                            <span class="line-through text-zinc-400">${escapeHtml(lesson.original_room)}</span>
+                                            <span class="font-semibold text-orange-600 dark:text-orange-400">${escapeHtml(lesson.room)}</span>
+                                        ` : `
+                                            <span class="${isCancelled ? 'line-through' : ''}">${escapeHtml(lesson.room)}</span>
+                                        `}
+                                    </span>
+                                </div>
+
+                                ${lesson.comment ? `
+                                    <p class="mt-2 text-xs break-words ${isCancelled ? 'text-red-600 dark:text-red-400' : 'text-orange-600 dark:text-orange-400'}">
+                                        Причина: ${escapeHtml(lesson.comment)}
+                                    </p>
+                                ` : ''}
+                            </div>
+
+                            <!-- Кнопки действий -->
+                            <div class="flex flex-wrap items-center gap-2 shrink-0">
+                                <button
+                                    type="button"
+                                    onclick="openAdminScheduleEditor(${lesson.schedule_id}, 'rescheduled')"
+                                    class="px-3 py-2 rounded-xl text-xs font-medium border border-orange-500/35 bg-orange-500/10 text-orange-700 dark:text-orange-400 hover:bg-orange-500/20 transition-colors"
+                                >
+                                    Перенести
+                                </button>
+                                <button
+                                    type="button"
+                                    onclick="openAdminScheduleEditor(${lesson.schedule_id}, 'cancelled')"
+                                    class="px-3 py-2 rounded-xl text-xs font-medium border border-red-500/35 bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20 transition-colors"
+                                >
+                                    Отменить
+                                </button>
+                                ${isModified ? `
+                                    <button
+                                        type="button"
+                                        onclick="revertAdminScheduleChange(${lesson.schedule_id})"
+                                        class="px-3 py-2 rounded-xl text-xs font-medium border border-zinc-300 dark:border-zinc-700 bg-[#FAFAFA] dark:bg-[#131316] text-zinc-700 dark:text-zinc-200 hover:border-[#4F46E5] dark:hover:border-[#818CF8] transition-colors"
+                                    >
+                                        Вернуть как было
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+
+                        <!-- Компактная форма переноса / отмены -->
+                        ${editor ? `
+                            <form onsubmit="submitAdminScheduleChange(event, ${lesson.schedule_id}, '${editor.mode}')" class="mt-4 pt-4 border-t border-zinc-200/80 dark:border-zinc-800/80 space-y-3">
+                                <div class="text-xs font-semibold ${editor.mode === 'cancelled' ? 'text-red-600 dark:text-red-400' : 'text-orange-600 dark:text-orange-400'}">
+                                    ${editor.mode === 'cancelled' ? 'Отмена занятия на выбранную дату' : 'Перенос занятия (укажите новую аудиторию и/или время)'}
+                                </div>
+
+                                ${editor.mode === 'rescheduled' ? `
+                                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                                        <div>
+                                            <label class="block text-[11px] text-zinc-500 dark:text-zinc-400 mb-1">Новая аудитория</label>
+                                            <input
+                                                id="edit-room-${lesson.schedule_id}"
+                                                type="text"
+                                                value="${escapeHtml(lesson.room)}"
+                                                placeholder="Ауд. 408"
+                                                class="w-full h-10 px-3 text-sm rounded-xl bg-[#FAFAFA] dark:bg-[#131316] border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] dark:focus:ring-[#818CF8]"
+                                            >
+                                        </div>
+                                        <div>
+                                            <label class="block text-[11px] text-zinc-500 dark:text-zinc-400 mb-1">Новое начало</label>
+                                            <input
+                                                id="edit-start-${lesson.schedule_id}"
+                                                type="time"
+                                                value="${escapeHtml(lesson.start_time)}"
+                                                class="w-full h-10 px-3 text-sm rounded-xl bg-[#FAFAFA] dark:bg-[#131316] border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] dark:focus:ring-[#818CF8]"
+                                            >
+                                        </div>
+                                        <div>
+                                            <label class="block text-[11px] text-zinc-500 dark:text-zinc-400 mb-1">Новый конец</label>
+                                            <input
+                                                id="edit-end-${lesson.schedule_id}"
+                                                type="time"
+                                                value="${escapeHtml(lesson.end_time)}"
+                                                class="w-full h-10 px-3 text-sm rounded-xl bg-[#FAFAFA] dark:bg-[#131316] border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] dark:focus:ring-[#818CF8]"
+                                            >
+                                        </div>
+                                    </div>
+                                ` : ''}
+
+                                <div>
+                                    <label class="block text-[11px] text-zinc-500 dark:text-zinc-400 mb-1">Причина / комментарий</label>
+                                    <input
+                                        id="edit-comment-${lesson.schedule_id}"
+                                        type="text"
+                                        value="${escapeHtml(lesson.comment || '')}"
+                                        placeholder="${editor.mode === 'cancelled' ? 'Например: Преподаватель на конференции' : 'Например: Замена аудитории по распоряжению деканата'}"
+                                        class="w-full h-10 px-3 text-sm rounded-xl bg-[#FAFAFA] dark:bg-[#131316] border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] dark:focus:ring-[#818CF8]"
+                                    >
+                                </div>
+
+                                <div class="flex flex-wrap items-center justify-end gap-2">
+                                    <button type="button" onclick="closeAdminScheduleEditor()" class="px-3.5 py-2 rounded-xl text-xs font-medium text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200/70 dark:hover:bg-zinc-800 transition-colors">
+                                        Закрыть
+                                    </button>
+                                    <button type="submit" class="px-4 py-2 rounded-xl text-xs font-medium text-white dark:text-[#0A0A0C] bg-[#4F46E5] dark:bg-[#818CF8] hover:opacity-90 transition-opacity">
+                                        ${editor.mode === 'cancelled' ? 'Подтвердить отмену' : 'Сохранить перенос'}
+                                    </button>
+                                </div>
+                            </form>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        }
+
+        async function submitAdminScheduleChange(event, scheduleId, mode) {
+            event.preventDefault();
+            const dateStr = document.getElementById('admin-schedule-date').value;
+            const comment = (document.getElementById(`edit-comment-${scheduleId}`)?.value || '').trim();
+
+            const payload = {
+                schedule_id: scheduleId,
+                change_date: dateStr,
+                status: mode,
+                comment: comment || null
+            };
+
+            if (mode === 'rescheduled') {
+                const newRoom = (document.getElementById(`edit-room-${scheduleId}`)?.value || '').trim();
+                const newStart = (document.getElementById(`edit-start-${scheduleId}`)?.value || '').trim();
+                const newEnd = (document.getElementById(`edit-end-${scheduleId}`)?.value || '').trim();
+                payload.new_room = newRoom || null;
+                payload.new_start_time = newStart || null;
+                payload.new_end_time = newEnd || null;
+            }
+
+            try {
+                await apiFetch('/admin/schedule/changes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const toastMsg = mode === 'cancelled'
+                    ? 'Пара отменена, студентам группы отправлено уведомление'
+                    : 'Пара перенесена, студентам группы отправлено уведомление';
+                showToast(toastMsg);
+                await loadAdminScheduleForDate();
+            } catch (err) {
+                if (err.message !== 'Unauthorized') showToast(err.message, 'error');
+            }
+        }
+
+        async function revertAdminScheduleChange(scheduleId) {
+            const dateStr = document.getElementById('admin-schedule-date').value;
+            try {
+                await apiFetch(`/admin/schedule/changes/${scheduleId}?date=${encodeURIComponent(dateStr)}`, {
+                    method: 'DELETE'
+                });
+                showToast('Пара возвращена в обычное расписание, студентам отправлено уведомление');
+                await loadAdminScheduleForDate();
+            } catch (err) {
+                if (err.message !== 'Unauthorized') showToast(err.message, 'error');
+            }
+        }
+
+        // --- 2. АДМИН: ЗАЯВКИ ---
+        function setAdminRequestFilter(filterVal) {
+            appState.adminRequestFilter = filterVal;
+            loadAdminRequests();
+        }
+
+        async function loadAdminRequests() {
+            document.querySelectorAll('.admin-req-filter').forEach(btn => {
+                const isActive = btn.dataset.reqFilter === appState.adminRequestFilter;
+                btn.classList.toggle('bg-[#4F46E5]', isActive);
+                btn.classList.toggle('dark:bg-[#818CF8]', isActive);
+                btn.classList.toggle('text-white', isActive);
+                btn.classList.toggle('dark:text-[#0A0A0C]', isActive);
+                btn.classList.toggle('text-zinc-600', !isActive);
+                btn.classList.toggle('dark:text-zinc-400', !isActive);
+            });
+
+            const listEl = document.getElementById('admin-requests-list');
+            listEl.innerHTML = `<div class="bg-[#FAFAFA] dark:bg-[#131316] border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 text-center text-sm text-zinc-500">Загрузка заявок...</div>`;
+
+            try {
+                appState.adminRequests = await apiFetch(`/admin/requests?filter_status=${encodeURIComponent(appState.adminRequestFilter)}`);
+                renderAdminRequestsList();
+            } catch (err) {
+                if (err.message !== 'Unauthorized') {
+                    listEl.innerHTML = `<div class="bg-[#FAFAFA] dark:bg-[#131316] border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 text-center text-sm text-red-500">${escapeHtml(err.message)}</div>`;
+                }
+            }
+        }
+
+        function renderAdminRequestsList() {
+            const listEl = document.getElementById('admin-requests-list');
+            const items = appState.adminRequests || [];
+
+            if (!items.length) {
+                listEl.innerHTML = `
+                    <div class="bg-[#FAFAFA] dark:bg-[#131316] border border-zinc-200 dark:border-zinc-800 rounded-2xl p-8 text-center text-sm text-zinc-500 dark:text-zinc-400">
+                        Заявок в этой категории пока нет.
+                    </div>
+                `;
+                return;
+            }
+
+            listEl.innerHTML = items.map(req => {
+                const st = getStatusMeta(req.status);
+                return `
+                    <div class="bg-[#FAFAFA] dark:bg-[#131316] border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 sm:p-5 shadow-sm space-y-3">
+                        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
+                            <div class="min-w-0">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <span class="text-sm sm:text-base font-semibold break-words">${escapeHtml(req.full_name)}</span>
+                                    <span class="px-2 py-0.5 rounded-md text-[11px] font-medium bg-[#F2F2F5] dark:bg-[#0A0A0C] border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300">
+                                        ${escapeHtml(req.group_name)}
+                                    </span>
+                                </div>
+                                <div class="text-sm font-medium text-[#4F46E5] dark:text-[#818CF8] mt-1 break-words">${escapeHtml(req.request_type)}</div>
+                                <div class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Подана: ${escapeHtml(formatDateTime(req.created_at))}</div>
+                            </div>
+                            <span class="self-start shrink-0 px-2.5 py-1 rounded-lg text-xs font-semibold ${st.cls}">${st.label}</span>
+                        </div>
+
+                        <div class="pt-3 border-t border-zinc-200/70 dark:border-zinc-800/70 flex flex-col sm:flex-row gap-2.5">
+                            <input
+                                id="admin-req-comment-${req.id}"
+                                type="text"
+                                value="${escapeHtml(req.admin_comment || '')}"
+                                placeholder="Комментарий для студента (например: Забрать в каб. 204)"
+                                class="flex-1 min-w-0 h-10 px-3 text-sm rounded-xl bg-[#F2F2F5] dark:bg-[#0A0A0C] border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] dark:focus:ring-[#818CF8]"
+                            >
+                            <div class="flex items-center gap-2 shrink-0">
+                                <button
+                                    type="button"
+                                    onclick="updateAdminRequestStatus(${req.id}, 'Готово')"
+                                    class="flex-1 sm:flex-none h-10 px-4 rounded-xl text-xs font-medium bg-emerald-600 hover:bg-emerald-500 text-white transition-colors"
+                                >
+                                    Готово
+                                </button>
+                                <button
+                                    type="button"
+                                    onclick="updateAdminRequestStatus(${req.id}, 'Отклонено')"
+                                    class="flex-1 sm:flex-none h-10 px-4 rounded-xl text-xs font-medium border border-red-500/35 bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20 transition-colors"
+                                >
+                                    Отклонить
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function updateAdminRequestStatus(requestId, statusLabel) {
+            const comment = (document.getElementById(`admin-req-comment-${requestId}`)?.value || '').trim();
+            try {
+                await apiFetch(`/admin/requests/${requestId}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        status: statusLabel,
+                        admin_comment: comment || null
+                    })
+                });
+                showToast(`Заявка переведена в статус «${statusLabel}», студенту отправлено уведомление`);
+                await loadAdminRequests();
+            } catch (err) {
+                if (err.message !== 'Unauthorized') showToast(err.message, 'error');
+            }
+        }
+
+        // --- 3. АДМИН: УВЕДОМЛЕНИЯ ---
+        async function initAdminNotificationsPage() {
+            await Promise.all([loadAdminGroups(), loadAdminStudents()]);
+
+            const groupSel = document.getElementById('admin-notif-group');
+            groupSel.innerHTML = appState.adminGroups.length
+                ? appState.adminGroups.map(g => `<option value="${escapeHtml(g)}">${escapeHtml(g)}</option>`).join('')
+                : `<option value="">Нет групп</option>`;
+
+            const studSel = document.getElementById('admin-notif-student');
+            studSel.innerHTML = appState.adminStudents.length
+                ? appState.adminStudents.map(s => `<option value="${s.id}">${escapeHtml(s.full_name)} (${escapeHtml(s.group_name)})</option>`).join('')
+                : `<option value="">Нет студентов</option>`;
+
+            handleAdminNotifTargetChange();
+        }
+
+        function handleAdminNotifTargetChange() {
+            const type = document.getElementById('admin-notif-target-type').value;
+            document.getElementById('admin-notif-group-wrap').classList.toggle('hidden', type !== 'group');
+            document.getElementById('admin-notif-student-wrap').classList.toggle('hidden', type !== 'student');
+        }
+
+        document.getElementById('admin-notif-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const submitBtn = document.getElementById('admin-notif-submit');
+            const targetType = document.getElementById('admin-notif-target-type').value;
+            const message = document.getElementById('admin-notif-message').value.trim();
+            if (!message) return;
+
+            let targetValue = null;
+            if (targetType === 'group') targetValue = document.getElementById('admin-notif-group').value;
+            if (targetType === 'student') targetValue = document.getElementById('admin-notif-student').value;
+
+            submitBtn.disabled = true;
+            try {
+                const res = await apiFetch('/admin/notifications', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        target_type: targetType,
+                        target_value: targetValue,
+                        message
+                    })
+                });
+                document.getElementById('admin-notif-message').value = '';
+                showToast(res.message || 'Уведомление успешно отправлено');
+            } catch (err) {
+                if (err.message !== 'Unauthorized') showToast(err.message, 'error');
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
+
+        // --- 4. АДМИН: СТУДЕНТЫ ---
+        function renderAdminStudentsPage() {
+            const students = appState.adminStudents || [];
+            document.getElementById('admin-students-count').textContent = String(students.length);
+
+            const tbody = document.getElementById('admin-students-tbody');
+            const cards = document.getElementById('admin-students-cards');
+
+            if (!students.length) {
+                tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-sm text-zinc-500">Студенты пока не зарегистрированы.</td></tr>`;
+                cards.innerHTML = `<div class="py-6 text-center text-sm text-zinc-500">Студенты пока не зарегистрированы.</div>`;
+                return;
+            }
+
+            tbody.innerHTML = students.map(s => `
+                <tr class="hover:bg-[#F2F2F5]/60 dark:hover:bg-[#0A0A0C]/50 transition-colors">
+                    <td class="py-3 pr-4 font-medium text-zinc-900 dark:text-zinc-100">${escapeHtml(s.full_name)}</td>
+                    <td class="py-3 px-3 text-zinc-500 dark:text-zinc-400 font-mono text-xs">${escapeHtml(s.username)}</td>
+                    <td class="py-3 px-3 text-zinc-700 dark:text-zinc-300">${escapeHtml(s.faculty)}</td>
+                    <td class="py-3 px-3">
+                        <span class="px-2.5 py-0.5 rounded-lg text-xs font-medium bg-[#4F46E5]/10 dark:bg-[#818CF8]/15 text-[#4F46E5] dark:text-[#818CF8]">${escapeHtml(s.group_name)}</span>
+                    </td>
+                    <td class="py-3 pl-3 text-right font-mono text-xs text-zinc-600 dark:text-zinc-300">${escapeHtml(s.grade_book)}</td>
+                </tr>
+            `).join('');
+
+            cards.innerHTML = students.map(s => `
+                <div class="rounded-xl bg-[#F2F2F5]/80 dark:bg-[#0A0A0C]/80 border border-zinc-200/70 dark:border-zinc-800/70 p-3.5 space-y-2">
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="text-sm font-semibold break-words">${escapeHtml(s.full_name)}</div>
+                        <span class="shrink-0 px-2 py-0.5 rounded-md text-[11px] font-medium bg-[#4F46E5]/10 dark:bg-[#818CF8]/15 text-[#4F46E5] dark:text-[#818CF8]">${escapeHtml(s.group_name)}</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+                        <div class="min-w-0">
+                            <span class="block text-[10px] uppercase tracking-wider text-zinc-400">Логин</span>
+                            <span class="font-mono text-zinc-700 dark:text-zinc-300 break-all">${escapeHtml(s.username)}</span>
+                        </div>
+                        <div class="min-w-0">
+                            <span class="block text-[10px] uppercase tracking-wider text-zinc-400">Факультет</span>
+                            <span class="text-zinc-700 dark:text-zinc-300 break-words">${escapeHtml(s.faculty)}</span>
+                        </div>
+                        <div class="col-span-2 min-w-0">
+                            <span class="block text-[10px] uppercase tracking-wider text-zinc-400">Зачётная книжка</span>
+                            <span class="font-mono text-zinc-700 dark:text-zinc-300 break-all">${escapeHtml(s.grade_book)}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('admin-student-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const errEl = document.getElementById('admin-student-form-error');
+            const submitBtn = document.getElementById('admin-student-submit');
+            errEl.classList.add('hidden');
+            submitBtn.disabled = true;
+
+            const payload = {
+                full_name: document.getElementById('new-stud-fullname').value.trim(),
+                username: document.getElementById('new-stud-username').value.trim(),
+                password: document.getElementById('new-stud-password').value,
+                faculty: document.getElementById('new-stud-faculty').value.trim(),
+                group_name: document.getElementById('new-stud-group').value.trim(),
+                grade_book: document.getElementById('new-stud-book').value.trim()
+            };
+
+            try {
+                const created = await apiFetch('/admin/students', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                event.target.reset();
+                showToast(`Студент ${created.full_name} успешно зарегистрирован`);
+                await Promise.all([loadAdminGroups(), loadAdminStudents()]);
+                renderAdminStudentsPage();
+            } catch (err) {
+                if (err.message !== 'Unauthorized') {
+                    errEl.textContent = err.message;
+                    errEl.classList.remove('hidden');
+                    showToast(err.message, 'error');
+                }
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
+
+                // --- 5. АДМИН: ОЦЕНКИ ---
+        function syncAdminGradeOptions() {
+            const type = document.getElementById('admin-grade-type').value;
+            const valSelect = document.getElementById('admin-grade-value');
+
+            if (type === 'экзамен') {
+                valSelect.innerHTML = `
+                    <option value="Отлично">Отлично (5)</option>
+                    <option value="Хорошо">Хорошо (4)</option>
+                    <option value="Удовлетворительно">Удовлетворительно (3)</option>
+                    <option value="Неудовлетворительно">Неудовлетворительно (2)</option>
+                `;
+            } else {
+                valSelect.innerHTML = `
+                    <option value="Зачтено">Зачтено</option>
+                    <option value="Незачет">Незачет</option>
+                `;
+            }
+        }
+
+        async function initAdminGradesPage() {
+            await loadAdminStudents();
+            const select = document.getElementById('admin-grade-student');
+            const prevValue = select.value;
+
+            select.innerHTML = appState.adminStudents.length
+                ? appState.adminStudents.map(s => `<option value="${s.id}">${escapeHtml(s.full_name)} (${escapeHtml(s.group_name)})</option>`).join('')
+                : `<option value="">Нет зарегистрированных студентов</option>`;
+
+            if (prevValue && appState.adminStudents.some(s => String(s.id) === prevValue)) {
+                select.value = prevValue;
+            }
+
+            syncAdminGradeOptions();
+            await loadAdminStudentGrades();
+        }
+
+        async function loadAdminStudentGrades() {
+            const studentId = document.getElementById('admin-grade-student').value;
+            const listEl = document.getElementById('admin-grades-list');
+            if (!studentId) {
+                appState.adminGrades = [];
+                renderAdminGradesList();
+                return;
+            }
+
+            listEl.innerHTML = `<div class="py-6 text-center text-sm text-zinc-500">Загрузка оценок...</div>`;
+            try {
+                appState.adminGrades = await apiFetch(`/admin/grades?student_id=${encodeURIComponent(studentId)}`);
+                renderAdminGradesList();
+            } catch (err) {
+                if (err.message !== 'Unauthorized') {
+                    listEl.innerHTML = `<div class="py-6 text-center text-sm text-red-500">${escapeHtml(err.message)}</div>`;
+                }
+            }
+        }
+
+        function renderAdminGradesList() {
+            const items = appState.adminGrades || [];
+            document.getElementById('admin-grades-count').textContent = String(items.length);
+            const listEl = document.getElementById('admin-grades-list');
+
+            if (!items.length) {
+                listEl.innerHTML = `<div class="py-6 text-center text-sm text-zinc-500 dark:text-zinc-400">У этого студента пока нет оценок.</div>`;
+                return;
+            }
+
+            listEl.innerHTML = items.map(item => {
+                const badge = getGradeBadgeMeta(item.grade);
+                return `
+                    <div class="rounded-xl bg-[#F2F2F5]/80 dark:bg-[#0A0A0C]/80 border border-zinc-200/70 dark:border-zinc-800/70 p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                        <div class="min-w-0">
+                            <div class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 break-words">${escapeHtml(item.subject)}</div>
+                            <div class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">${item.semester} семестр • <span class="capitalize">${escapeHtml(item.assessment_type)}</span></div>
+                        </div>
+                        <div class="flex items-center justify-between sm:justify-end gap-2 shrink-0">
+                            <span class="px-2.5 py-1 rounded-lg text-xs font-semibold ${badge.cls}">${escapeHtml(badge.label)}</span>
+                            <button
+                                type="button"
+                                onclick="deleteAdminGrade(${item.id})"
+                                title="Удалить оценку"
+                                aria-label="Удалить оценку"
+                                class="w-8 h-8 rounded-lg border border-red-500/25 bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20 flex items-center justify-center transition-colors"
+                            >
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        }
+
+        async function deleteAdminGrade(gradeId) {
+            try {
+                await apiFetch(`/admin/grades/${gradeId}`, { method: 'DELETE' });
+                showToast('Оценка удалена');
+                await loadAdminStudentGrades();
+            } catch (err) {
+                if (err.message !== 'Unauthorized') showToast(err.message, 'error');
+            }
+        }
+
+        document.getElementById('admin-grade-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const submitBtn = document.getElementById('admin-grade-submit');
+            const studentId = Number(document.getElementById('admin-grade-student').value);
+            if (!studentId) return;
+
+            const payload = {
+                user_id: studentId,
+                semester: Number(document.getElementById('admin-grade-semester').value),
+                subject: document.getElementById('admin-grade-subject').value.trim(),
+                assessment_type: document.getElementById('admin-grade-type').value,
+                grade: document.getElementById('admin-grade-value').value
+            };
+
+            submitBtn.disabled = true;
+            try {
+                const res = await apiFetch('/admin/grades', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                document.getElementById('admin-grade-subject').value = '';
+                showToast(res.message || 'Оценка выставлена');
+                await loadAdminStudentGrades();
+            } catch (err) {
+                if (err.message !== 'Unauthorized') showToast(err.message, 'error');
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
+
+
+        // =============================================================
+        // ==================== АВТОРИЗАЦИЯ И СТАРТ ====================
+        // =============================================================
+
+        function showAuthPage() {
+            document.getElementById('app-shell').classList.add('hidden');
+            document.getElementById('auth-page').classList.remove('hidden');
+            history.replaceState(null, '', '#login');
+        }
+
+        async function showAppShell() {
+            appState.userId = getUserIdFromToken(appState.token);
+            loadThemeForAccount(appState.userId);
+
+            try {
+                const me = await apiFetch('/me');
+                appState.me = me;
+                appState.role = me.role;
+                appState.userId = String(me.id);
+                loadThemeForAccount(appState.userId);
+            } catch (err) {
+                if (err.message !== 'Unauthorized') {
+                    showToast('Не удалось загрузить данные аккаунта', 'error');
+                    logout();
+                }
+                return;
+            }
+
+            if (appState.role !== 'admin' && appState.role !== 'student') {
+                showToast('Для этой роли кабинет пока не настроен', 'error');
+                logout();
+                return;
+            }
+
+            configureRoleUI(appState.role, appState.me.full_name);
+            document.getElementById('auth-page').classList.add('hidden');
+            document.getElementById('app-shell').classList.remove('hidden');
+
+            const hashPage = window.location.hash.replace('#', '');
+
+            if (appState.role === 'admin') {
+                const targetPage = ADMIN_PAGES.includes(hashPage) ? hashPage : 'admin-schedule';
+                await navigate(targetPage);
+            } else {
+                await Promise.all([
+                    loadProfileData(),
+                    loadNotificationsData()
+                ]);
+                const targetPage = STUDENT_PAGES.includes(hashPage) ? hashPage : 'home';
+                await navigate(targetPage);
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('dekanat_token');
+            appState.token = null;
+            appState.userId = null;
+            appState.role = null;
+            appState.me = null;
+            appState.profile = null;
+            appState.todaySchedule = { items: [], holiday: null };
+            appState.weekSchedule = { items: [], holidays: {} };
+            appState.grades = [];
+            appState.requests = [];
+            appState.notifications = [];
+            appState.selectedSemester = null;
+            appState.adminGroups = [];
+            appState.adminStudents = [];
+            appState.adminRequests = [];
+            appState.adminScheduleData = null;
+            appState.adminActiveEditor = null;
+            appState.adminGrades = [];
+            document.getElementById('login-password').value = '';
+            document.getElementById('login-error').classList.add('hidden');
+            showAuthPage();
+        }
+
+        document.getElementById('login-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const errorEl = document.getElementById('login-error');
+            const submitBtn = document.getElementById('login-submit');
+            errorEl.classList.add('hidden');
+            submitBtn.disabled = true;
+
+            const body = new URLSearchParams();
+            body.append('username', document.getElementById('login-username').value.trim());
+            body.append('password', document.getElementById('login-password').value);
+
+            try {
+                const res = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body
+                });
+
+                if (!res.ok) throw new Error('Invalid credentials');
+
+                const data = await res.json();
+                appState.token = data.access_token;
+                localStorage.setItem('dekanat_token', data.access_token);
+                await showAppShell();
+            } catch {
+                errorEl.classList.remove('hidden');
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
+
+        window.addEventListener('hashchange', () => {
+            if (!appState.token || !appState.role) return;
+            const hashPage = window.location.hash.replace('#', '');
+            if (hashPage && hashPage !== appState.currentPage && hashPage !== 'login') {
+                navigate(hashPage);
+            }
+        });
+
+        // Старт
+        initTheme();
+        lucide.createIcons();
+
+        if (appState.token) {
+            showAppShell();
+        } else {
+            showAuthPage();
+        }
+    </script>
+</body>
+</html>
